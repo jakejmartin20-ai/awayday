@@ -136,7 +136,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   color: var(--scarlet); letter-spacing: .02em; margin-top: 4px;
 }
 .slice-label {
-  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11px;
+  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 9px;
   letter-spacing: .04em; text-transform: uppercase;
 }
 

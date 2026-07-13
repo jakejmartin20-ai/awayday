@@ -6,10 +6,10 @@ const SLICE_COLORS = ['#C8102E', '#1C1C1C', '#D9A441', '#1B3A5C']
 const R = 100
 const DURATION = 5500 // ~5.5 seconds, heavy ease-out. Locked Session 2.
 
-// Label runs RADIALLY — from near the hub out to the rim, along the slice's
-// centreline. That gives even PHILADELPHIA the full length of the slice.
+// Label runs RADIALLY — anchored at the rim, reading in along the slice's
+// centreline. One fixed type size for every city, no stretching: a long name
+// just reaches further toward the hub than a short one.
 const LABEL_OUTER = 94
-const LABEL_INNER = 30
 
 const pt = (deg, r) => {
   const rad = (deg * Math.PI) / 180
@@ -128,8 +128,6 @@ export default function Wheel({ team, games, onBack, onSeeTrip }) {
                       transform={leftHalf ? 'rotate(90) skewX(-10)' : 'rotate(-90) skewX(-10)'}
                       x={leftHalf ? -LABEL_OUTER : LABEL_OUTER}
                       textAnchor={leftHalf ? 'start' : 'end'}
-                      textLength={LABEL_OUTER - LABEL_INNER}
-                      lengthAdjust="spacingAndGlyphs"
                     >
                       {cityForGame(g).city}
                     </text>
