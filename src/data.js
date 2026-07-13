@@ -698,6 +698,32 @@ export const GAMES = [
 ]
 
 // ---------------------------------------------------------------------------
+// WHERE THE GROUND ACTUALLY IS
+// ---------------------------------------------------------------------------
+// The map lands on the TOWN, because the town is the trip. But nine of these
+// grounds are not in the town on the card — Gillette is 28 miles from Boston,
+// Levi's is 40 from San Francisco, MetLife is in another state. A group books a
+// hotel downtown and finds out on the Saturday.
+//
+// So: if the ground is somewhere other than the town, the venue caption says
+// where, and how far. If it IS in the town — Lambeau, Wembley, the Superdome —
+// the caption stays plain. The line only shows up where you'd want it.
+const VENUE_NOTES = {
+  'Gillette Stadium': 'Foxborough, 28 miles',
+  'Levi\u2019s Stadium': 'Santa Clara, 40 miles',
+  'AT&T Stadium': 'Arlington, 20 miles',
+  'Hard Rock Stadium': 'Miami Gardens, 16 miles',
+  'State Farm Stadium': 'Glendale, 13 miles',
+  'Highmark Stadium': 'Orchard Park, 11 miles',
+  'SoFi Stadium': 'Inglewood, 10 miles',
+  'Northwest Stadium': 'Landover, 10 miles',
+  'MetLife Stadium': 'East Rutherford, New Jersey, 9 miles',
+  'Stade de France': 'Saint-Denis, 6 miles'
+}
+
+const venueLine = (venue) => VENUE_NOTES[venue] ? `${venue} \u00b7 ${VENUE_NOTES[venue]}` : venue
+
+// ---------------------------------------------------------------------------
 // THE SLATE — every game not played in your own town.
 // ---------------------------------------------------------------------------
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
@@ -724,14 +750,14 @@ export function awaySlate(teamId) {
     // already-played games are excluded (locked, Session 1)
     .filter(g => g.date >= now)
     .sort((a, b) => a.date.localeCompare(b.date))
-    .map((g, i) => {
+    .map((g) => {
       const oppId = g.home === teamId ? g.away : g.home
       const opp = teamById(oppId)
       const card = CITIES[g.cityId]
       return {
         id: `${teamId}-${g.date}-${g.cityId}`,
         opponent: opp ? opp.name : oppId,
-        venue: g.venue,
+        venue: venueLine(g.venue),
         cityId: g.cityId,
         city: card.city,
         state: card.state,
