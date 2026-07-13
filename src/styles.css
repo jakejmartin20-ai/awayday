@@ -1,0 +1,187 @@
+/* AWAY DAY — the look. Retro ESPN broadcast. Locked Session 2. */
+
+:root {
+  --cream: #EFE7D6;
+  --charcoal: #1C1C1C;
+  --scarlet: #C8102E;
+  --gold: #D9A441;
+  --navy: #1B3A5C;
+  --border: #CFC3A8;
+  --muted: #8A7C60;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--cream);
+  color: var(--charcoal);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
+}
+
+button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.app {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 18px 16px 48px;
+}
+
+.skew { display: inline-block; transform: skewX(-10deg); }
+
+/* --- header --- */
+.header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.back {
+  background: none; border: 2px solid var(--charcoal); color: var(--charcoal);
+  width: 34px; height: 34px; font-size: 16px; font-family: inherit;
+  cursor: pointer; flex: none;
+}
+.wordmark { font-weight: 700; font-size: 26px; letter-spacing: .04em; line-height: 1; }
+.wordmark-bar { flex: 1; height: 8px; background: var(--scarlet); transform: skewX(-10deg); }
+
+/* --- strip --- */
+.strip {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--charcoal); color: var(--cream);
+  padding: 9px 12px; font-size: 13px; letter-spacing: .12em;
+}
+.strip-right { color: var(--gold); font-weight: 700; }
+
+/* --- kicker --- */
+.kicker {
+  color: var(--muted); font-size: 12px; letter-spacing: .26em;
+  margin: 18px 0 10px;
+}
+
+/* --- buttons --- */
+.btn {
+  display: block; width: 100%; font-family: inherit; font-weight: 700;
+  font-size: 21px; letter-spacing: .1em; text-transform: uppercase;
+  padding: 16px; border: 2px solid var(--charcoal); cursor: pointer;
+  margin-top: 14px;
+}
+.btn-loud { background: var(--scarlet); color: var(--cream); }
+.btn-quiet { background: transparent; color: var(--charcoal); }
+.btn:disabled { opacity: .45; }
+
+/* --- mode picker --- */
+.mode-card {
+  display: block; width: 100%; text-align: left; font-family: inherit;
+  border: 2px solid var(--charcoal); padding: 20px; margin-bottom: 14px;
+  cursor: pointer; position: relative; background: transparent;
+}
+.mode-loud { background: var(--scarlet); color: var(--cream); }
+.mode-quiet { background: transparent; color: var(--muted); border-color: var(--border); }
+.mode-title { font-weight: 700; font-size: 30px; letter-spacing: .03em; line-height: 1; }
+.mode-rule { height: 4px; width: 54px; margin: 12px 0; transform: skewX(-10deg); }
+.mode-loud .mode-rule { background: var(--cream); }
+.mode-quiet .mode-rule { background: var(--border); }
+.mode-line { font-size: 14px; letter-spacing: .06em; }
+.soon-chip {
+  position: absolute; top: 16px; right: 16px; background: var(--gold);
+  color: var(--charcoal); font-weight: 700; font-size: 11px;
+  letter-spacing: .16em; padding: 3px 8px;
+}
+
+/* --- league picker --- */
+.league-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; font-family: inherit; text-align: left; cursor: pointer;
+  padding: 22px 18px; margin-bottom: 14px; border: 2px solid var(--charcoal);
+  color: var(--cream);
+}
+.league-nfl { background: var(--charcoal); }
+.league-nhl { background: var(--navy); }
+.league-name { font-weight: 700; font-size: 40px; line-height: 1; letter-spacing: .02em; }
+.league-season { font-size: 12px; letter-spacing: .2em; opacity: .75; margin-top: 6px; }
+.league-arrow { font-size: 28px; font-weight: 700; }
+
+.hairline { height: 1px; background: var(--border); margin: 20px 0 12px; }
+.note { color: var(--muted); font-size: 13px; letter-spacing: .1em; }
+
+/* --- team list --- */
+.team-row {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; font-family: inherit; text-align: left; cursor: pointer;
+  background: transparent; border: 2px solid var(--charcoal);
+  border-left-width: 14px; padding: 14px 14px; margin-bottom: 10px;
+}
+.team-name { font-weight: 700; font-size: 21px; letter-spacing: .03em; }
+.chev { font-size: 20px; font-weight: 700; }
+
+/* --- slate --- */
+.slate-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 2px; border-bottom: 1px solid var(--border);
+}
+.num-chip {
+  background: var(--charcoal); color: var(--gold); font-weight: 700;
+  font-size: 14px; padding: 5px 8px; letter-spacing: .05em; flex: none;
+}
+.slate-opp { flex: 1; font-weight: 700; font-size: 19px; letter-spacing: .03em; }
+.slate-date { color: var(--navy); font-size: 14px; letter-spacing: .08em; white-space: nowrap; }
+.spacer { height: 16px; }
+
+/* --- wheel --- */
+.wheel-wrap { position: relative; margin: 6px 0 0; }
+.wheel-svg { display: block; width: 100%; height: auto; }
+.ticker {
+  text-align: center; color: var(--muted); font-size: 14px;
+  letter-spacing: .24em; height: 20px; margin-top: 8px;
+}
+.landing-city {
+  text-align: center; font-weight: 700; font-size: 46px; line-height: 1;
+  color: var(--scarlet); letter-spacing: .02em; margin-top: 4px;
+}
+.slice-label {
+  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 9px;
+  letter-spacing: .06em; text-transform: uppercase;
+}
+
+/* --- lower third (shared by wheel + result) --- */
+.lower-third {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--charcoal); color: var(--cream);
+  padding: 12px 14px; margin-top: 12px;
+}
+.lt-label { font-weight: 700; font-size: 17px; letter-spacing: .05em; }
+.lt-date { color: var(--gold); font-weight: 700; font-size: 15px; letter-spacing: .08em; }
+
+/* --- result --- */
+.result-city {
+  font-weight: 700; font-size: 58px; line-height: .95;
+  color: var(--scarlet); letter-spacing: .01em;
+}
+.result-state {
+  color: var(--navy); font-size: 15px; letter-spacing: .32em; margin-top: 8px;
+}
+.map-cut {
+  border-top: 5px solid var(--charcoal); border-bottom: 5px solid var(--charcoal);
+  margin-top: 18px; position: relative;
+}
+.map-cut iframe {
+  display: block; width: 100%; height: 220px; border: 0;
+  filter: saturate(.7) contrast(1.05);
+}
+.venue-chip {
+  position: absolute; left: 10px; bottom: 10px; background: var(--charcoal);
+  color: var(--cream); font-size: 12px; letter-spacing: .1em; padding: 6px 9px;
+}
+.section-head { display: flex; align-items: center; gap: 10px; margin: 26px 0 12px; }
+.accent { width: 10px; height: 26px; transform: skewX(-10deg); flex: none; }
+.accent-scarlet { background: var(--scarlet); }
+.accent-navy { background: var(--navy); }
+.section-title { font-weight: 700; font-size: 22px; letter-spacing: .06em; }
+.fact {
+  font-size: 15px; letter-spacing: .04em; padding: 9px 0;
+  border-bottom: 1px solid var(--border); text-transform: none;
+}
+.todo { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.todo-num { color: var(--gold); font-weight: 700; font-size: 16px; flex: none; }
+.todo-text { font-size: 15px; letter-spacing: .04em; text-transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
