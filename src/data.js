@@ -185,7 +185,10 @@ export const TEAMS = [
   { id: 'nhl-det', league: 'nhl', name: 'Detroit', cityId: 'detroit', venue: 'Little Caesars Arena' },
   { id: 'nhl-phi', league: 'nhl', name: 'Philadelphia', cityId: 'philadelphia', venue: 'Wells Fargo Center' },
   { id: 'nhl-tbl', league: 'nhl', name: 'Tampa Bay', cityId: 'tampa', venue: 'Amalie Arena' },
-  { id: 'nhl-stl', league: 'nhl', name: 'St Louis', cityId: 'stlouis', venue: 'Enterprise Center' }
+  { id: 'nhl-stl', league: 'nhl', name: 'St Louis', cityId: 'stlouis', venue: 'Enterprise Center' },
+  { id: 'nhl-ari', league: 'nhl', name: 'Arizona', cityId: 'phoenix', venue: 'Mullett Arena' },
+  { id: 'nhl-dal', league: 'nhl', name: 'Dallas', cityId: 'dallas', venue: 'American Airlines Center' },
+  { id: 'nhl-nor', league: 'nhl', name: 'New Orleans', cityId: 'neworleans', venue: 'Smoothie King Center' }
 ]
 
 export const teamsInLeague = (leagueId) => TEAMS.filter(t => t.league === leagueId)
@@ -237,6 +240,25 @@ export function awaySlate(teamId) {
     })
   }
   return games
+}
+
+// TOWNS --------------------------------------------------------------------
+// THE WHEEL'S UNIT IS THE TOWN, NOT THE FIXTURE.
+// A 41-game away slate visits a city more than once — an NHL team plays at the
+// same rink twice. Two identical slices would break the wheel: you couldn't
+// tell which one won, and a near-miss on a town you were also going to hit
+// anyway isn't a near-miss at all.
+//
+// So the slate is grouped into towns. Each town is ONE candidate, however many
+// games it holds. Every town on the slate has exactly the same shot as every
+// other — and if fate lands on a town with two dates, it takes one of them.
+export function townsFromSlate(games) {
+  const byCity = new Map()
+  games.forEach(g => {
+    if (!byCity.has(g.cityId)) byCity.set(g.cityId, [])
+    byCity.get(g.cityId).push(g)
+  })
+  return [...byCity.values()] // an array of towns; each town is its list of games
 }
 
 // The wheel's fixed slice count. The deal exists to feed it exactly this many.

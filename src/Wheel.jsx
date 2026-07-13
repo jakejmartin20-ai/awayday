@@ -126,7 +126,7 @@ export default function Wheel({ games, teamName, dealt, onResult, onSpinAgain, o
   return (
     <>
       <Header onBack={spinning ? undefined : onBack} />
-      <Strip left={teamName} right={`${n} ON THE WHEEL`} />
+      <Strip left={teamName} right={`${n} TOWNS ON THE WHEEL`} />
 
       <div className="pad">
         <Kicker>{win ? 'Fate picked' : spinning ? 'Fate is deciding' : 'Spin it'}</Kicker>

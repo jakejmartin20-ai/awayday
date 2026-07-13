@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Header, Strip, Kicker, Loud, Quiet } from './Frame'
-import { LEAGUES, TEAMS, SLICES, teamsInLeague, teamById, awaySlate } from './data'
+import { LEAGUES, TEAMS, SLICES, teamsInLeague, teamById, awaySlate, townsFromSlate } from './data'
 import Wheel from './Wheel'
 import Result from './Result'
 
@@ -113,12 +113,19 @@ function TeamPicker({ leagueId, onPick, onBack }) {
 // ---------------------------------------------------------------------------
 // 4. AWAY SLATE — and THE DEAL
 //
-// Slate of 9 or fewer: no deal. The button reads SPIN and every game is a slice.
-// Slate of more than 9: the list shuffles, nine rows go scarlet one at a time
-// and fly out of the pile, and those nine become the wheel.
+// THE DEAL DEALS TOWNS, NOT FIXTURES. A 41-game slate visits some cities twice;
+// each city is one candidate on the wheel, never two slices with the same name.
+// If fate deals a town that holds two dates, it takes one of them on the way out.
+//
+// 9 towns or fewer: no deal. The button reads SPIN, every town is a slice.
+// More than 9 towns: the pile shuffles, nine rows go scarlet one at a time and
+// fly out, and those nine towns become the wheel.
 // ---------------------------------------------------------------------------
+const oneOf = (arr) => arr[Math.floor(Math.random() * arr.length)]
+
 function Slate({ team, games, autoDeal, onDealt, onBack }) {
-  const needsDeal = games.length > SLICES
+  const towns = townsFromSlate(games)
+  const needsDeal = towns.length > SLICES
 
   const [order, setOrder] = useState(games)
   const [phase, setPhase] = useState('idle')   // idle | shuffle | picking
@@ -134,8 +141,8 @@ function Slate({ team, games, autoDeal, onDealt, onBack }) {
   const deal = () => {
     if (phase !== 'idle') return
 
-    // Nothing to deal — the whole slate already fits the wheel.
-    if (!needsDeal) { onDealt(games, false); return }
+    // Nothing to deal — every town on the slate already fits on the wheel.
+    if (!needsDeal) { onDealt(towns.map(t => t[0]), false); return }
 
     setPhase('shuffle')
 
@@ -154,7 +161,8 @@ function Slate({ team, games, autoDeal, onDealt, onBack }) {
     timers.current.push(setTimeout(() => {
       setFlash(-1)
       setPhase('picking')
-      const nine = shuffled(games).slice(0, SLICES)
+      // Nine distinct towns. One date each, chosen by fate.
+      const nine = shuffled(towns).slice(0, SLICES).map(oneOf)
 
       nine.forEach((g, i) => {
         timers.current.push(setTimeout(() => {
@@ -184,11 +192,11 @@ function Slate({ team, games, autoDeal, onDealt, onBack }) {
 
   const busy = phase !== 'idle'
   const stripRight = phase === 'picking'
-    ? `${SLICES} ON THE WHEEL`
+    ? `${SLICES} TOWNS ON THE WHEEL`
     : `${games.length} GAMES`
 
   const line = needsDeal
-    ? 'Fate deals nine of these onto the wheel.'
+    ? `Fate deals nine of these ${towns.length} towns onto the wheel.`
     : 'Every one of these is a slice on the wheel.'
 
   return (
