@@ -1,4 +1,11 @@
-/* AWAY DAY — the look. Retro ESPN broadcast. Locked Session 2. */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
+
+/* ---------------------------------------------------------------------------
+   AWAY DAY — RETRO ESPN BROADCAST
+   Cream ground. Charcoal type. Scarlet for energy. Chunky skewed bars,
+   square corners, flat fills. No gradients, no glow, no rounded pills.
+   Every design change in this app should land in this file.
+--------------------------------------------------------------------------- */
 
 :root {
   --cream: #EFE7D6;
@@ -8,182 +15,466 @@
   --navy: #1B3A5C;
   --border: #CFC3A8;
   --muted: #8A7C60;
+  --skew: skewX(-10deg);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-body {
+html, body {
+  margin: 0;
+  padding: 0;
   background: var(--cream);
   color: var(--charcoal);
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
   font-weight: 500;
-  text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
 }
 
-button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+button { font-family: inherit; cursor: pointer; }
 
 .app {
-  max-width: 520px;
+  max-width: 480px;
   margin: 0 auto;
-  padding: 18px 16px 48px;
+  min-height: 100vh;
+  background: var(--cream);
+  padding-bottom: 40px;
 }
 
-.skew { display: inline-block; transform: skewX(-10deg); }
+.pad { padding: 0 16px 24px; }
 
-/* --- header --- */
-.header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+/* --- HEADER -------------------------------------------------------------- */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+}
+
 .back {
-  background: none; border: 2px solid var(--charcoal); color: var(--charcoal);
-  width: 34px; height: 34px; font-size: 16px; font-family: inherit;
-  cursor: pointer; flex: none;
+  background: none;
+  border: none;
+  padding: 0 4px 0 0;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--charcoal);
 }
-.wordmark { font-weight: 700; font-size: 26px; letter-spacing: .04em; line-height: 1; }
-.wordmark-bar { flex: 1; height: 8px; background: var(--scarlet); transform: skewX(-10deg); }
 
-/* --- strip --- */
+.back--empty { width: 0; padding: 0; }
+
+.wordmark {
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transform: var(--skew);
+  white-space: nowrap;
+}
+
+.wordmark-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--scarlet);
+  transform: var(--skew);
+  margin-left: 6px;
+}
+
+/* --- STRIP --------------------------------------------------------------- */
 .strip {
-  display: flex; justify-content: space-between; align-items: center;
-  background: var(--charcoal); color: var(--cream);
-  padding: 9px 12px; font-size: 13px; letter-spacing: .12em;
+  background: var(--charcoal);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 16px;
+  transform: var(--skew);
+  margin: 0 12px 18px;
 }
-.strip-right { color: var(--gold); font-weight: 700; }
 
-/* --- kicker --- */
+.strip > * { transform: skewX(10deg); }
+
+.strip-left {
+  color: var(--cream);
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+}
+
+.strip-right {
+  color: var(--gold);
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+}
+
+/* --- KICKER -------------------------------------------------------------- */
 .kicker {
-  color: var(--muted); font-size: 12px; letter-spacing: .26em;
-  margin: 18px 0 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  margin: 4px 0 10px;
 }
 
-/* --- buttons --- */
+.note {
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  margin: 18px 0 0;
+}
+
+.note--tight { margin: 0 0 14px; }
+
+/* --- BUTTONS ------------------------------------------------------------- */
 .btn {
-  display: block; width: 100%; font-family: inherit; font-weight: 700;
-  font-size: 21px; letter-spacing: .1em; text-transform: uppercase;
-  padding: 16px; border: 2px solid var(--charcoal); cursor: pointer;
-  margin-top: 14px;
-}
-.btn-loud { background: var(--scarlet); color: var(--cream); }
-.btn-quiet { background: transparent; color: var(--charcoal); }
-.btn:disabled { opacity: .45; }
-
-/* --- mode picker --- */
-.mode-card {
-  display: block; width: 100%; text-align: left; font-family: inherit;
-  border: 2px solid var(--charcoal); padding: 20px; margin-bottom: 14px;
-  cursor: pointer; position: relative; background: transparent;
-}
-.mode-loud { background: var(--scarlet); color: var(--cream); }
-.mode-quiet { background: transparent; color: var(--muted); border-color: var(--border); }
-.mode-title { font-weight: 700; font-size: 30px; letter-spacing: .03em; line-height: 1; }
-.mode-rule { height: 4px; width: 54px; margin: 12px 0; transform: skewX(-10deg); }
-.mode-loud .mode-rule { background: var(--cream); }
-.mode-quiet .mode-rule { background: var(--border); }
-.mode-line { font-size: 14px; letter-spacing: .06em; }
-.soon-chip {
-  position: absolute; top: 16px; right: 16px; background: var(--gold);
-  color: var(--charcoal); font-weight: 700; font-size: 11px;
-  letter-spacing: .16em; padding: 3px 8px;
+  display: block;
+  width: 100%;
+  border: 3px solid var(--charcoal);
+  padding: 14px 12px;
+  margin-top: 12px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: 0.14em;
+  transform: var(--skew);
+  border-radius: 0;
 }
 
-/* --- league picker --- */
-.league-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; font-family: inherit; text-align: left; cursor: pointer;
-  padding: 22px 18px; margin-bottom: 14px; border: 2px solid var(--charcoal);
+.btn > * { display: inline-block; transform: skewX(10deg); }
+
+.btn--loud { background: var(--scarlet); color: var(--cream); }
+.btn--quiet { background: transparent; color: var(--charcoal); }
+.btn:disabled { opacity: 0.45; }
+
+/* --- MODE PICKER CARDS ---------------------------------------------------- */
+.card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 3px solid var(--charcoal);
+  border-radius: 0;
+  padding: 18px 16px;
+  margin-bottom: 14px;
+  background: transparent;
+}
+
+.card--loud { background: var(--scarlet); color: var(--cream); }
+.card--quiet { background: transparent; color: var(--charcoal); opacity: 0.75; }
+
+.card-title {
+  display: block;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: 0.06em;
+  transform: var(--skew);
+}
+
+.card-sub {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chip {
+  display: inline-block;
+  margin-left: 10px;
+  background: var(--gold);
+  color: var(--charcoal);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  padding: 3px 8px;
+  vertical-align: middle;
+}
+
+/* --- LEAGUE PICKER -------------------------------------------------------- */
+.league {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 3px solid var(--charcoal);
+  border-radius: 0;
+  padding: 20px 16px;
+  margin-bottom: 14px;
   color: var(--cream);
 }
-.league-nfl { background: var(--charcoal); }
-.league-nhl { background: var(--navy); }
-.league-name { font-weight: 700; font-size: 40px; line-height: 1; letter-spacing: .02em; }
-.league-season { font-size: 12px; letter-spacing: .2em; opacity: .75; margin-top: 6px; }
-.league-arrow { font-size: 28px; font-weight: 700; }
 
-.hairline { height: 1px; background: var(--border); margin: 20px 0 12px; }
-.note { color: var(--muted); font-size: 13px; letter-spacing: .1em; }
+.league--nfl { background: var(--charcoal); }
+.league--nhl { background: var(--navy); }
 
-/* --- team list --- */
+.league-name {
+  display: block;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 34px;
+  letter-spacing: 0.08em;
+  transform: var(--skew);
+}
+
+.league-note {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* --- TEAM PICKER ---------------------------------------------------------- */
+.team-list { display: flex; flex-direction: column; gap: 8px; }
+
 .team-row {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; font-family: inherit; text-align: left; cursor: pointer;
-  background: transparent; border: 2px solid var(--charcoal);
-  border-left-width: 14px; padding: 14px 14px; margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--cream);
+  border: 2px solid var(--border);
+  border-left: 10px solid var(--scarlet);
+  border-radius: 0;
+  padding: 13px 12px;
 }
-.team-name { font-weight: 700; font-size: 21px; letter-spacing: .03em; }
-.chev { font-size: 20px; font-weight: 700; }
 
-/* --- slate --- */
+.team-row--nhl { border-left-color: var(--navy); }
+
+.team-name {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: 0.06em;
+  transform: var(--skew);
+}
+
+.chev { color: var(--muted); font-size: 20px; }
+
+/* --- AWAY SLATE ----------------------------------------------------------- */
+.slate {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 46vh;
+  overflow-y: auto;
+  border-top: 2px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  padding: 8px 0;
+}
+
+/* Once the deal starts, the pile stops being a list you can scroll. */
+.slate--busy { overflow: hidden; }
+
 .slate-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 13px 2px; border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--cream);
+  border: 2px solid var(--border);
+  padding: 10px;
+  max-height: 60px;
+  overflow: hidden;
+  flex: 0 0 auto;
 }
-.num-chip {
-  background: var(--charcoal); color: var(--gold); font-weight: 700;
-  font-size: 14px; padding: 5px 8px; letter-spacing: .05em; flex: none;
-}
-.slate-opp { flex: 1; font-weight: 700; font-size: 19px; letter-spacing: .03em; }
-.slate-date { color: var(--navy); font-size: 14px; letter-spacing: .08em; white-space: nowrap; }
-.spacer { height: 16px; }
 
-/* --- wheel --- */
-.wheel-wrap { position: relative; margin: 6px 0 0; }
-.wheel-svg { display: block; width: 100%; height: auto; }
-.ticker {
-  text-align: center; color: var(--muted); font-size: 14px;
-  letter-spacing: .24em; height: 20px; margin-top: 8px;
+.num {
+  background: var(--gold);
+  color: var(--charcoal);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  padding: 3px 6px;
+  transform: var(--skew);
 }
-.landing-city {
-  text-align: center; font-weight: 700; font-size: 46px; line-height: 1;
-  color: var(--scarlet); letter-spacing: .02em; margin-top: 4px;
+
+.opp {
+  flex: 1;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.05em;
+  transform: var(--skew);
 }
+
+.when {
+  color: var(--navy);
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+}
+
+/* THE DEAL --------------------------------------------------------------- */
+/* A row flashing gold as the pile shuffles. */
+.slate-row--flash {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+/* A row fate has taken: it goes scarlet, then flies out of the pile. */
+.slate-row--picked {
+  background: var(--scarlet);
+  border-color: var(--charcoal);
+  color: var(--cream);
+  animation: fly 460ms ease-in forwards;
+}
+
+.slate-row--picked .when { color: var(--cream); }
+.slate-row--picked .num { background: var(--cream); }
+
+@keyframes fly {
+  0% { transform: translateX(0) scale(1); opacity: 1; }
+  25% { transform: translateX(0) scale(1.03); opacity: 1; }
+  100% {
+    transform: translateX(130%) scale(0.9);
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: -6px;
+    border-width: 0;
+  }
+}
+
+/* --- THE WHEEL ------------------------------------------------------------ */
+.wheel-wrap { display: flex; justify-content: center; margin-top: 4px; }
+.wheel { width: 100%; max-width: 340px; height: auto; }
+
 .slice-label {
-  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 9px;
-  letter-spacing: .04em; text-transform: uppercase;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.08em;
 }
 
-/* --- lower third (shared by wheel + result) --- */
+.ticker {
+  text-align: center;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  min-height: 20px;
+  margin: 6px 0 10px;
+}
+
+.landing { margin-top: 4px; }
+
+.landing-city {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--scarlet);
+  letter-spacing: 0.02em;
+  transform: var(--skew);
+  margin: 6px 0 12px;
+}
+
+/* --- LOWER THIRD (wheel landing + result) --------------------------------- */
 .lower-third {
-  display: flex; justify-content: space-between; align-items: center;
-  background: var(--charcoal); color: var(--cream);
-  padding: 12px 14px; margin-top: 12px;
+  background: var(--charcoal);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 14px;
+  transform: var(--skew);
 }
-.lt-label { font-weight: 700; font-size: 17px; letter-spacing: .05em; }
-.lt-date { color: var(--gold); font-weight: 700; font-size: 15px; letter-spacing: .08em; }
 
-/* --- result --- */
+.lower-third > * { transform: skewX(10deg); }
+
+.lt-left {
+  color: var(--cream);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lt-right {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* --- RESULT SCREEN -------------------------------------------------------- */
 .result-city {
-  font-weight: 700; font-size: 58px; line-height: .95;
-  color: var(--scarlet); letter-spacing: .01em;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 52px;
+  line-height: 0.95;
+  color: var(--scarlet);
+  transform: var(--skew);
+  margin-bottom: 6px;
 }
-.result-state {
-  color: var(--navy); font-size: 15px; letter-spacing: .32em; margin-top: 8px;
-}
-.map-cut {
-  border-top: 5px solid var(--charcoal); border-bottom: 5px solid var(--charcoal);
-  margin-top: 18px; position: relative;
-}
-.map-cut iframe {
-  display: block; width: 100%; height: 220px; border: 0;
-  filter: saturate(.7) contrast(1.05);
-}
-/* Venue sits UNDER the lower-third as a caption. Never on the map — it covered
-   OpenStreetMap's attribution, which has to stay visible. */
-.venue-line {
-  color: var(--muted); font-size: 12px; letter-spacing: .2em;
-  padding: 8px 2px 0;
-}
-.section-head { display: flex; align-items: center; gap: 10px; margin: 26px 0 12px; }
-.accent { width: 10px; height: 26px; transform: skewX(-10deg); flex: none; }
-.accent-scarlet { background: var(--scarlet); }
-.accent-navy { background: var(--navy); }
-.section-title { font-weight: 700; font-size: 22px; letter-spacing: .06em; }
-.fact {
-  font-size: 15px; letter-spacing: .04em; padding: 9px 0;
-  border-bottom: 1px solid var(--border); text-transform: none;
-}
-.todo { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.todo-num { color: var(--gold); font-weight: 700; font-size: 16px; flex: none; }
-.todo-text { font-size: 15px; letter-spacing: .04em; text-transform: none; }
 
+.result-state {
+  text-transform: uppercase;
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.2em;
+  margin-bottom: 16px;
+}
+
+/* Nothing may be overlaid on the map — OSM's attribution has to stay visible. */
+.map-card {
+  border-top: 4px solid var(--charcoal);
+  border-bottom: 4px solid var(--charcoal);
+  line-height: 0;
+  margin-bottom: 10px;
+}
+
+.map { width: 100%; height: 220px; border: 0; display: block; }
+
+.venue {
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  margin: 8px 0 22px;
+}
+
+.section { margin-bottom: 22px; }
+
+.section-head {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.1em;
+  transform: var(--skew);
+  padding-left: 10px;
+  margin-bottom: 10px;
+}
+
+.section-head--scarlet { border-left: 10px solid var(--scarlet); }
+.section-head--navy { border-left: 10px solid var(--navy); }
+
+.fact {
+  margin: 0 0 10px;
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.todo {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.todo-num {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  transform: var(--skew);
+}
+
+.todo-text { font-size: 15px; line-height: 1.4; }
+
+/* --- Reduced motion ------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; }
+  .slate-row--picked { animation-duration: 1ms; }
 }

@@ -1,296 +1,243 @@
-// AWAY DAY — DUMMY DATA (Session 5)
+// ---------------------------------------------------------------------------
+// AWAY DAY — DATA
+// ---------------------------------------------------------------------------
+// Three lists, exactly as specced:
+//   1. CITIES — the city cards (shared by both leagues AND both modes)
+//   2. TEAMS  — team -> league, home city, venue
+//   3. GAMES  — home team, away team, date  (here: generated dummy fixtures)
 //
-// This file proves the SHAPE, nothing else. None of it is fact-checked and none
-// of the fixtures are real. The real bakes replace the games generator at the
-// bottom with explicit, tap-checkable rows, one file per league, once each
-// league's official schedule is out.
+// EVERYTHING BELOW IS DUMMY DATA. It exists to prove the shape end to end.
+// The real bakes replace CITIES / TEAMS / the fixture list — nothing else in
+// the app has to change.
 //
-// Three lists, kept separate on purpose:
-//   1. TEAMS  — name, league, which city card it points at, venue
-//   2. GAMES  — home team, away team, date
-//   3. CITIES — the city cards, shared across both leagues AND both modes
+// NFL teams get a 9-game away slate  -> 9 or fewer, so NO DEAL, straight to the wheel.
+// NHL teams get a 41-game away slate -> the deal fires.
+// ---------------------------------------------------------------------------
 
-export const LEAGUES = [
-  { id: 'nfl', name: 'NFL', season: '2026 Season' },
-  { id: 'nhl', name: 'NHL', season: '2026-27 Season' }
-]
-
-// --- 1. TEAMS ---------------------------------------------------------------
-export const TEAMS = [
-  { id: 'nfl-sea', league: 'nfl', name: 'Seattle Seahawks',    cityId: 'seattle',      venue: 'Lumen Field' },
-  { id: 'nfl-den', league: 'nfl', name: 'Denver Broncos',      cityId: 'denver',       venue: 'Empower Field at Mile High' },
-  { id: 'nfl-chi', league: 'nfl', name: 'Chicago Bears',       cityId: 'chicago',      venue: 'Soldier Field' },
-  { id: 'nfl-no',  league: 'nfl', name: 'New Orleans Saints',  cityId: 'neworleans',   venue: 'Caesars Superdome' },
-  { id: 'nfl-kc',  league: 'nfl', name: 'Kansas City Chiefs',  cityId: 'kansascity',   venue: 'Arrowhead Stadium' },
-  { id: 'nfl-phi', league: 'nfl', name: 'Philadelphia Eagles', cityId: 'philadelphia', venue: 'Lincoln Financial Field' },
-  { id: 'nfl-mia', league: 'nfl', name: 'Miami Dolphins',      cityId: 'miami',        venue: 'Hard Rock Stadium' },
-  { id: 'nfl-buf', league: 'nfl', name: 'Buffalo Bills',       cityId: 'buffalo',      venue: 'Highmark Stadium' },
-  { id: 'nfl-gb',  league: 'nfl', name: 'Green Bay Packers',   cityId: 'greenbay',     venue: 'Lambeau Field' },
-
-  { id: 'nhl-sea', league: 'nhl', name: 'Seattle Kraken',        cityId: 'seattle',    venue: 'Climate Pledge Arena' },
-  { id: 'nhl-col', league: 'nhl', name: 'Colorado Avalanche',    cityId: 'denver',     venue: 'Ball Arena' },
-  { id: 'nhl-chi', league: 'nhl', name: 'Chicago Blackhawks',    cityId: 'chicago',    venue: 'United Center' },
-  { id: 'nhl-nsh', league: 'nhl', name: 'Nashville Predators',   cityId: 'nashville',  venue: 'Bridgestone Arena' },
-  { id: 'nhl-bos', league: 'nhl', name: 'Boston Bruins',         cityId: 'boston',     venue: 'TD Garden' },
-  { id: 'nhl-pit', league: 'nhl', name: 'Pittsburgh Penguins',   cityId: 'pittsburgh', venue: 'PPG Paints Arena' },
-  { id: 'nhl-min', league: 'nhl', name: 'Minnesota Wild',        cityId: 'stpaul',     venue: 'Xcel Energy Center' },
-  { id: 'nhl-det', league: 'nhl', name: 'Detroit Red Wings',     cityId: 'detroit',    venue: 'Little Caesars Arena' },
-  { id: 'nhl-vgk', league: 'nhl', name: 'Vegas Golden Knights',  cityId: 'lasvegas',   venue: 'T-Mobile Arena' }
-]
-
-// --- 3. CITY CARDS ----------------------------------------------------------
+// 1. CITY CARDS -------------------------------------------------------------
+// city + state · lat/lng (also plots Mode 2's deal-map pins) · ~3 facts · 2-3 things to do
 export const CITIES = {
-  seattle: {
-    city: 'Seattle', state: 'Washington', lat: 47.6062, lon: -122.3321,
-    facts: [
-      'Ringed by water and mountains — Puget Sound on one side, Mount Rainier looming on the other.',
-      'The modern coffeehouse habit was exported to the world from here.',
-      'It rains less per year than New York. It just spreads it out.'
-    ],
-    todo: [
-      'Pike Place Market early, before the crowds land.',
-      'The ferry to Bainbridge Island — cheapest good view in America.',
-      'A pint in Ballard, which is basically a brewery district with houses in it.'
-    ]
-  },
-  denver: {
-    city: 'Denver', state: 'Colorado', lat: 39.7392, lon: -104.9903,
-    facts: [
-      'Exactly one mile above sea level. The 13th step of the Capitol says so.',
-      'The Rockies sit on the western horizon like a wall.',
-      'Thin air: the beer hits harder, and so does the walk uphill.'
-    ],
-    todo: [
-      'Red Rocks — go even if nobody is playing.',
-      'RiNo for street art and taprooms.',
-      'A day up into the mountains if you have one spare.'
-    ]
-  },
-  chicago: {
-    city: 'Chicago', state: 'Illinois', lat: 41.8781, lon: -87.6298,
-    facts: [
-      'The skyline was invented here — the first steel-framed skyscraper went up in 1885.',
-      'The lakefront runs for miles, with beaches in the middle of the city.',
-      'The river gets dyed green once a year, for reasons nobody can fully justify.'
-    ],
-    todo: [
-      'An architecture boat tour down the river.',
-      'Deep dish once, thin tavern-style twice.',
-      'A blues bar with no sign on the door.'
-    ]
-  },
-  neworleans: {
-    city: 'New Orleans', state: 'Louisiana', lat: 29.9511, lon: -90.0715,
-    facts: [
-      'Jazz was born here, and the city has never fully stopped playing it.',
-      'Below sea level, held back by levees and stubbornness.',
-      'The French Quarter is mostly Spanish architecture, which annoys everyone who learns it.'
-    ],
-    todo: [
-      'Frenchmen Street for live music, not Bourbon.',
-      'Beignets at 2am, powdered sugar everywhere.',
-      'The streetcar out along St Charles Avenue.'
-    ]
-  },
-  kansascity: {
-    city: 'Kansas City', state: 'Missouri', lat: 39.0997, lon: -94.5786,
-    facts: [
-      'Claims more fountains than any city outside Rome.',
-      'Barbecue here means burnt ends, and it is a serious matter.',
-      'It sits across two states and argues about which one counts.'
-    ],
-    todo: [
-      'A barbecue pilgrimage. Pick one, queue anyway.',
-      'The Nelson-Atkins museum, and the giant shuttlecocks on the lawn.',
-      'The Crossroads district after dark.'
-    ]
-  },
-  philadelphia: {
-    city: 'Philadelphia', state: 'Pennsylvania', lat: 39.9526, lon: -75.1652,
-    facts: [
-      'The Declaration of Independence was signed here in 1776.',
-      'The cheesesteak argument is real, and you will be asked to pick a side.',
-      'The art museum steps are a tourist attraction because of a boxing film.'
-    ],
-    todo: [
-      'Reading Terminal Market for lunch.',
-      'Independence Hall and the Liberty Bell.',
-      'A dive bar in Fishtown afterwards.'
-    ]
-  },
-  miami: {
-    city: 'Miami', state: 'Florida', lat: 25.7617, lon: -80.1918,
-    facts: [
-      'More Art Deco buildings in one district than anywhere on earth.',
-      'Spanish is spoken as widely as English.',
-      'It is closer to Havana than it is to Orlando.'
-    ],
-    todo: [
-      'Cuban coffee and a walk through Little Havana.',
-      'South Beach at sunrise, when it belongs to nobody.',
-      'Wynwood for the murals.'
-    ]
-  },
   buffalo: {
-    city: 'Buffalo', state: 'New York', lat: 42.8864, lon: -78.8784,
+    city: 'Buffalo', state: 'New York', lat: 42.8864, lng: -78.8784,
     facts: [
-      'The chicken wing was invented here in 1964, in a bar, late at night.',
-      'Niagara Falls is twenty minutes up the road.',
-      'The winters are a personality trait.'
+      'The chicken wing was invented here in 1964, at the Anchor Bar on Main Street.',
+      'It sits at the top of the Niagara River — the falls are twenty minutes north.',
+      'Grain elevators on the waterfront were the first of their kind anywhere.'
     ],
-    todo: [
-      'The Falls. Cross to the Canadian side if you have a passport.',
-      'Wings at the Anchor Bar, out of sheer obligation.',
-      'The Albright-Knox for a serious modern art collection.'
-    ]
-  },
-  greenbay: {
-    city: 'Green Bay', state: 'Wisconsin', lat: 44.5133, lon: -88.0133,
-    facts: [
-      'The smallest city in the NFL, by a long way.',
-      'The team is owned by its own supporters — no billionaire, just shareholders.',
-      'Cheese is not a joke here. Do not make the joke.'
-    ],
-    todo: [
-      'Lambeau Field, even on a day with no game.',
-      'A supper club: brandy old fashioned, then a fish fry.',
-      'The bay itself, which most visitors never bother to look at.'
-    ]
-  },
-  nashville: {
-    city: 'Nashville', state: 'Tennessee', lat: 36.1627, lon: -86.7816,
-    facts: [
-      'Music City: the recording industry built half of it.',
-      'There is a full-scale replica of the Parthenon in a public park.',
-      'Hot chicken is a local invention and a genuine hazard.'
-    ],
-    todo: [
-      'A honky-tonk crawl down Broadway.',
-      'The Ryman Auditorium, the room where it all happened.',
-      'Hot chicken — order one heat level below your ego.'
-    ]
-  },
-  boston: {
-    city: 'Boston', state: 'Massachusetts', lat: 42.3601, lon: -71.0589,
-    facts: [
-      'The Common, dating to 1634, is the oldest public park in the country.',
-      'The city is small enough to cross on foot in an afternoon.',
-      'The accent is not a put-on.'
-    ],
-    todo: [
-      'The Freedom Trail — a red line painted on the pavement. Follow it.',
-      'Oysters and a beer in the North End.',
-      'Harvard Yard, across the river.'
-    ]
+    todo: ['Silo City — grain elevators you can climb', 'Niagara Falls, from the quiet side', 'A wing crawl through Elmwood Village']
   },
   pittsburgh: {
-    city: 'Pittsburgh', state: 'Pennsylvania', lat: 40.4406, lon: -79.9959,
+    city: 'Pittsburgh', state: 'Pennsylvania', lat: 40.4406, lng: -79.9959,
     facts: [
-      'Built where three rivers meet, and stitched together by more than 400 bridges.',
-      'It was a steel town. The rebuild into a tech-and-medicine city is the local pride.',
-      'They put the chips inside the sandwich here. All of them.'
+      'Three rivers meet at a point in the middle of town.',
+      'It has more bridges than Venice — 446 of them.',
+      'The city was built on steel and now runs on robotics labs.'
     ],
-    todo: [
-      'The Duquesne Incline, for the view over the point.',
-      'The Andy Warhol Museum — he was a local boy.',
-      'A sandwich at Primanti Bros, chips and all.'
-    ]
+    todo: ['The Duquesne Incline at dusk', 'The Andy Warhol Museum', 'A sandwich with the fries inside it at Primanti Bros']
   },
-  stpaul: {
-    city: 'Saint Paul', state: 'Minnesota', lat: 44.9537, lon: -93.0900,
+  denver: {
+    city: 'Denver', state: 'Colorado', lat: 39.7392, lng: -104.9903,
     facts: [
-      'The quieter twin. Minneapolis is across the river.',
-      'The Mississippi starts small up here and runs right past downtown.',
-      'It gets properly, unarguably cold.'
+      'Exactly one mile above sea level — the 13th step of the Capitol is the marker.',
+      'The thin air makes a baseball fly about 9% further.',
+      'It has more breweries per head than almost anywhere in America.'
     ],
-    todo: [
-      'Skyway-hopping between buildings if the weather turns.',
-      'Grand Avenue, for food and dive bars with good beer lists.',
-      'Cross the river and do the Minneapolis lakes.'
-    ]
+    todo: ['Red Rocks — go even without a gig on', 'Union Station for a drink', 'Larimer Square after dark']
+  },
+  nashville: {
+    city: 'Nashville', state: 'Tennessee', lat: 36.1627, lng: -86.7816,
+    facts: [
+      'There is live music on Broadway every day of the year, for free.',
+      'It holds a full-size replica of the Parthenon, built in 1897.',
+      'More songs are written here per day than anywhere on earth.'
+    ],
+    todo: ['The Ryman Auditorium', 'Hot chicken at Prince’s', 'Honky-tonks on Lower Broadway']
+  },
+  neworleans: {
+    city: 'New Orleans', state: 'Louisiana', lat: 29.9511, lng: -90.0715,
+    facts: [
+      'The city sits below sea level, held back by levees.',
+      'Jazz was born here, in Storyville, around 1900.',
+      'Streetcars have run on St Charles Avenue since 1835.'
+    ],
+    todo: ['A brass band in the Marigny', 'Beignets at Café du Monde', 'The Garden District on foot']
+  },
+  chicago: {
+    city: 'Chicago', state: 'Illinois', lat: 41.8781, lng: -87.6298,
+    facts: [
+      'The first skyscraper in the world went up here in 1885.',
+      'The river is dyed green every March, and it runs backwards by design.',
+      'The nickname is about windy politicians, not weather.'
+    ],
+    todo: ['The Chicago Architecture river cruise', 'Green Mill jazz lounge', 'Deep dish, once, so you can say you did']
+  },
+  minneapolis: {
+    city: 'Minneapolis', state: 'Minnesota', lat: 44.9778, lng: -93.2650,
+    facts: [
+      'There are more lakes inside the city limits than there are neighbourhoods.',
+      'A five-mile skyway lets you cross downtown without ever going outside.',
+      'Prince recorded most of Purple Rain a few miles from downtown.'
+    ],
+    todo: ['First Avenue', 'The Stone Arch Bridge at sunset', 'Cycling the Chain of Lakes']
+  },
+  seattle: {
+    city: 'Seattle', state: 'Washington', lat: 47.6062, lng: -122.3321,
+    facts: [
+      'It rains less here per year than in New York — it just rains slowly.',
+      'The first Starbucks opened at Pike Place in 1971.',
+      'Mount Rainier is 60 miles away and still dominates the skyline.'
+    ],
+    todo: ['Pike Place Market early, before the crowds', 'A ferry to Bainbridge and back', 'Discovery Park for the Sound']
+  },
+  boston: {
+    city: 'Boston', state: 'Massachusetts', lat: 42.3601, lng: -71.0589,
+    facts: [
+      'The oldest public park in America is here — the Common, 1634.',
+      'The subway was the first in the United States.',
+      'Half the city is landfill; the Back Bay was literally a bay.'
+    ],
+    todo: ['The Freedom Trail, all of it', 'Oysters in the North End', 'The Isabella Stewart Gardner Museum']
   },
   detroit: {
-    city: 'Detroit', state: 'Michigan', lat: 42.3314, lon: -83.0458,
+    city: 'Detroit', state: 'Michigan', lat: 42.3314, lng: -83.0458,
     facts: [
-      'The car was mass-produced here, and Motown was recorded here.',
-      'Canada is to the south. Look at a map — it is genuinely true.',
-      'The downtown revival is one of the great American comeback stories.'
+      'Motown was recorded in a house on West Grand Boulevard.',
+      'It is the only major US city where you look SOUTH to Canada.',
+      'The first mile of paved road in the world was laid here in 1909.'
     ],
-    todo: [
-      'The Motown Museum, in the actual house.',
-      'Eastern Market on a Saturday.',
-      'A coney dog, from whichever of the two rival shops you get told to.'
-    ]
+    todo: ['The Motown Museum', 'Eastern Market on a Saturday', 'The Guardian Building lobby']
   },
-  lasvegas: {
-    city: 'Las Vegas', state: 'Nevada', lat: 36.1699, lon: -115.1398,
+  philadelphia: {
+    city: 'Philadelphia', state: 'Pennsylvania', lat: 39.9526, lng: -75.1652,
     facts: [
-      'The whole thing sits in the middle of the Mojave Desert.',
-      'The Strip is not actually inside the city limits.',
-      'Red Rock Canyon is twenty minutes from the neon.'
+      'It was the capital of the United States before Washington existed.',
+      'The city has more murals than any other in America.',
+      'The cheesesteak argument has been running since 1930.'
     ],
-    todo: [
-      'Fremont Street for old Vegas, not the Strip.',
-      'A drive out to Red Rock in the morning.',
-      'One sensible night, one silly one.'
-    ]
+    todo: ['Reading Terminal Market', 'The Barnes Foundation', 'The steps, obviously']
+  },
+  phoenix: {
+    city: 'Phoenix', state: 'Arizona', lat: 33.4484, lng: -112.0740,
+    facts: [
+      'It is the hottest big city in the United States.',
+      'The Sonoran Desert around it is the only place saguaro cactus grow wild.',
+      'The Grand Canyon is a three-hour drive north.'
+    ],
+    todo: ['Camelback Mountain at dawn', 'The Desert Botanical Garden', 'Old Town Scottsdale']
+  },
+  dallas: {
+    city: 'Dallas', state: 'Texas', lat: 32.7767, lng: -96.7970,
+    facts: [
+      'The integrated circuit was invented here in 1958.',
+      'It has more restaurants per head than New York City.',
+      'The frozen margarita machine was built in a Dallas kitchen.'
+    ],
+    todo: ['Deep Ellum for live music', 'The Sixth Floor Museum', 'Barbecue in Lockhart, if you have the car']
+  },
+  tampa: {
+    city: 'Tampa', state: 'Florida', lat: 27.9506, lng: -82.4572,
+    facts: [
+      'Ybor City was the cigar capital of the world.',
+      'The Cuban sandwich was invented here, not in Cuba.',
+      'It sits on the largest open-water estuary in Florida.'
+    ],
+    todo: ['Ybor City and its street chickens', 'The Riverwalk', 'A day on Clearwater Beach']
+  },
+  stlouis: {
+    city: 'St Louis', state: 'Missouri', lat: 38.6270, lng: -90.1994,
+    facts: [
+      'The Gateway Arch is the tallest man-made monument in the country.',
+      'The 1904 World’s Fair happened here, and so, allegedly, did the ice cream cone.',
+      'Forest Park is larger than Central Park.'
+    ],
+    todo: ['Ride to the top of the Arch', 'The City Museum — it is not a museum', 'Forest Park on foot']
   }
 }
 
-// --- 2. GAMES (DUMMY) -------------------------------------------------------
-// Every team plays away at every other team in its league, which gives each team
-// an 8-game away slate — 8 slices on the wheel. The real bake replaces this
-// generator with explicit rows.
-function buildDummyGames() {
+// 2. TEAMS ------------------------------------------------------------------
+export const LEAGUES = [
+  { id: 'nfl', name: 'NFL', note: 'The 2026 season' },
+  { id: 'nhl', name: 'NHL', note: 'The 2026-27 season' }
+]
+
+export const TEAMS = [
+  // NFL — 10 teams, so each has a 9-game away slate. No deal.
+  { id: 'nfl-buf', league: 'nfl', name: 'Buffalo', cityId: 'buffalo', venue: 'Highmark Stadium' },
+  { id: 'nfl-pit', league: 'nfl', name: 'Pittsburgh', cityId: 'pittsburgh', venue: 'Acrisure Stadium' },
+  { id: 'nfl-den', league: 'nfl', name: 'Denver', cityId: 'denver', venue: 'Empower Field' },
+  { id: 'nfl-nsh', league: 'nfl', name: 'Nashville', cityId: 'nashville', venue: 'Nissan Stadium' },
+  { id: 'nfl-nor', league: 'nfl', name: 'New Orleans', cityId: 'neworleans', venue: 'Caesars Superdome' },
+  { id: 'nfl-chi', league: 'nfl', name: 'Chicago', cityId: 'chicago', venue: 'Soldier Field' },
+  { id: 'nfl-min', league: 'nfl', name: 'Minnesota', cityId: 'minneapolis', venue: 'U.S. Bank Stadium' },
+  { id: 'nfl-sea', league: 'nfl', name: 'Seattle', cityId: 'seattle', venue: 'Lumen Field' },
+  { id: 'nfl-phi', league: 'nfl', name: 'Philadelphia', cityId: 'philadelphia', venue: 'Lincoln Financial Field' },
+  { id: 'nfl-dal', league: 'nfl', name: 'Dallas', cityId: 'dallas', venue: 'AT&T Stadium' },
+
+  // NHL — 12 teams, each with a 41-game away slate. The deal fires.
+  { id: 'nhl-buf', league: 'nhl', name: 'Buffalo', cityId: 'buffalo', venue: 'KeyBank Center' },
+  { id: 'nhl-pit', league: 'nhl', name: 'Pittsburgh', cityId: 'pittsburgh', venue: 'PPG Paints Arena' },
+  { id: 'nhl-col', league: 'nhl', name: 'Colorado', cityId: 'denver', venue: 'Ball Arena' },
+  { id: 'nhl-nsh', league: 'nhl', name: 'Nashville', cityId: 'nashville', venue: 'Bridgestone Arena' },
+  { id: 'nhl-chi', league: 'nhl', name: 'Chicago', cityId: 'chicago', venue: 'United Center' },
+  { id: 'nhl-min', league: 'nhl', name: 'Minnesota', cityId: 'minneapolis', venue: 'Xcel Energy Center' },
+  { id: 'nhl-sea', league: 'nhl', name: 'Seattle', cityId: 'seattle', venue: 'Climate Pledge Arena' },
+  { id: 'nhl-bos', league: 'nhl', name: 'Boston', cityId: 'boston', venue: 'TD Garden' },
+  { id: 'nhl-det', league: 'nhl', name: 'Detroit', cityId: 'detroit', venue: 'Little Caesars Arena' },
+  { id: 'nhl-phi', league: 'nhl', name: 'Philadelphia', cityId: 'philadelphia', venue: 'Wells Fargo Center' },
+  { id: 'nhl-tbl', league: 'nhl', name: 'Tampa Bay', cityId: 'tampa', venue: 'Amalie Arena' },
+  { id: 'nhl-stl', league: 'nhl', name: 'St Louis', cityId: 'stlouis', venue: 'Enterprise Center' }
+]
+
+export const teamsInLeague = (leagueId) => TEAMS.filter(t => t.league === leagueId)
+export const teamById = (id) => TEAMS.find(t => t.id === id)
+
+// 3. GAMES ------------------------------------------------------------------
+// DUMMY fixture generator. The real bake ships a plain list of
+// { home, away, date } rows and this function just reads it instead.
+
+const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+
+function fmt(d) {
+  return `${DAYS[d.getDay()]} ${String(d.getDate()).padStart(2, '0')} ${MONTHS[d.getMonth()]}`
+}
+
+// How many away games a league plays. This is the whole reason the deal exists.
+const AWAY_GAMES = { nfl: 9, nhl: 41 }
+
+// Every away game a team has left to play. Home team supplies city + venue.
+export function awaySlate(teamId) {
+  const team = teamById(teamId)
+  if (!team) return []
+
+  const opponents = teamsInLeague(team.league).filter(t => t.id !== team.id)
+  const count = AWAY_GAMES[team.league] || opponents.length
+
+  const start = new Date(2026, 8, 12) // 12 Sept 2026
+  const step = team.league === 'nfl' ? 7 : 3 // NFL weekly, NHL every few days
+
   const games = []
-  LEAGUES.forEach((l) => {
-    const teams = TEAMS.filter((t) => t.league === l.id)
-    const startISO = l.id === 'nfl' ? '2026-09-13' : '2026-10-08'
-    const stepDays = l.id === 'nfl' ? 7 : 5
-    teams.forEach((away) => {
-      let n = 0
-      teams.forEach((home) => {
-        if (home.id === away.id) return
-        const d = new Date(startISO + 'T12:00:00')
-        d.setDate(d.getDate() + n * stepDays + (n % 3))
-        games.push({
-          id: away.id + '-at-' + home.id,
-          league: l.id,
-          homeTeamId: home.id,
-          awayTeamId: away.id,
-          date: d.toISOString().slice(0, 10)
-        })
-        n++
-      })
+  for (let i = 0; i < count; i++) {
+    const home = opponents[i % opponents.length]
+    const card = CITIES[home.cityId]
+    const date = new Date(start)
+    date.setDate(start.getDate() + i * step)
+    games.push({
+      id: `${teamId}-away-${i}`,
+      opponent: home.name,
+      venue: home.venue,
+      cityId: home.cityId,
+      city: card.city,
+      state: card.state,
+      lat: card.lat,
+      lng: card.lng,
+      facts: card.facts,
+      todo: card.todo,
+      date: fmt(date)
     })
-  })
+  }
   return games
 }
 
-export const GAMES = buildDummyGames()
-
-// --- joins & helpers --------------------------------------------------------
-export const teamById = (id) => TEAMS.find((t) => t.id === id)
-export const cityById = (id) => CITIES[id]
-
-export const teamsByLeague = (leagueId) =>
-  TEAMS.filter((t) => t.league === leagueId).sort((a, b) => a.name.localeCompare(b.name))
-
-// Away games only. Already-played excluded. Soonest first.
-export function awayGamesFor(teamId) {
-  const today = new Date().toISOString().slice(0, 10)
-  return GAMES
-    .filter((g) => g.awayTeamId === teamId && g.date >= today)
-    .sort((a, b) => a.date.localeCompare(b.date))
-}
-
-export function cityForGame(game) {
-  return cityById(teamById(game.homeTeamId).cityId)
-}
-
-export function fmtDate(iso) {
-  const d = new Date(iso + 'T12:00:00')
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  const mon = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  return `${days[d.getDay()]} ${d.getDate()} ${mon[d.getMonth()]}`
-}
+// The wheel's fixed slice count. The deal exists to feed it exactly this many.
+export const SLICES = 9

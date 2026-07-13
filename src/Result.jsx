@@ -1,77 +1,76 @@
 import { Header, Strip, Kicker, Loud, Quiet } from './Frame'
-import { teamById, cityForGame, fmtDate } from './data'
 
-export default function Result({ team, game, index, total, onBack, onSpinAgain }) {
-  const opp = teamById(game.homeTeamId)
-  const city = cityForGame(game)
+// ---------------------------------------------------------------------------
+// AWAY DAY — THE RESULT SCREEN
+// A trip-inspiration card, not a logistics sheet. Deliberately absent:
+// kickoff time, travel distance, nearest airport.
+//
+// The map is a free OpenStreetMap embed. NOTHING may be overlaid on it —
+// OSM's attribution has to stay visible.
+// ---------------------------------------------------------------------------
 
-  // Free OpenStreetMap embed — no key, no account, no bill.
+function osmUrl(lat, lng) {
   const d = 0.06
-  const bbox = [city.lon - d * 1.6, city.lat - d, city.lon + d * 1.6, city.lat + d].join('%2C')
-  const mapSrc =
-    `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${city.lat}%2C${city.lon}`
+  const bbox = [lng - d, lat - d / 2, lng + d, lat + d / 2].join(',')
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`
+}
 
+export default function Result({ game, teamName, onSpinAgain, onBack }) {
   const share = async () => {
-    const text = `Fate picked ${city.city}. ${team.name} at ${opp.name}, ${fmtDate(game.date)}. — Away Day`
+    const text = `AWAY DAY — fate picked ${game.city.toUpperCase()}. ${teamName} at ${game.opponent}, ${game.date}. ${game.venue}. Wherever it lands, that's the trip.`
     try {
-      if (navigator.share) {
-        await navigator.share({ title: 'Away Day', text })
-      } else {
-        await navigator.clipboard.writeText(text)
-        alert('Copied to clipboard')
-      }
-    } catch (e) {
-      // share sheet dismissed — nothing to do
-    }
+      if (navigator.share) await navigator.share({ title: 'Away Day', text })
+      else await navigator.clipboard.writeText(text)
+    } catch (e) { /* the user backed out of the share sheet — nothing to do */ }
   }
 
   return (
-    <div className="app">
+    <>
       <Header onBack={onBack} />
-      <Strip left={`${team.name} · Your Away Day`} right={`Game ${index + 1} / ${total}`} />
+      <Strip left={teamName} right="The trip" />
 
-      <Kicker>Fate picked</Kicker>
-      <div className="result-city">
-        <span className="skew">{city.city}</span>
-      </div>
-      <div className="result-state">{city.state}</div>
+      <div className="pad">
+        <Kicker>Fate picked</Kicker>
+        <div className="result-city">{game.city}</div>
+        <div className="result-state">{game.state}</div>
 
-      {/* The map is left clean — nothing sits on top of it, including OSM's
-          own attribution, which we are required to leave visible. */}
-      <div className="map-cut">
-        <iframe title={`Map of ${city.city}`} src={mapSrc} loading="lazy" />
-      </div>
-
-      <div className="lower-third">
-        <span className="lt-label skew">at {opp.name}</span>
-        <span className="lt-date">{fmtDate(game.date)}</span>
-      </div>
-
-      <div className="venue-line">{opp.venue}</div>
-
-      <div className="section-head">
-        <div className="accent accent-scarlet" />
-        <div className="section-title skew">The Town</div>
-      </div>
-      {city.facts.map((f, i) => (
-        <div className="fact" key={i}>
-          {f}
+        <div className="map-card">
+          <iframe
+            title={`Map of ${game.city}`}
+            className="map"
+            src={osmUrl(game.lat, game.lng)}
+            loading="lazy"
+          />
         </div>
-      ))}
 
-      <div className="section-head">
-        <div className="accent accent-navy" />
-        <div className="section-title skew">While You&rsquo;re There</div>
-      </div>
-      {city.todo.map((t, i) => (
-        <div className="todo" key={i}>
-          <span className="todo-num">{String(i + 1).padStart(2, '0')}</span>
-          <span className="todo-text">{t}</span>
+        <div className="lower-third">
+          <span className="lt-left">AT {game.opponent.toUpperCase()}</span>
+          <span className="lt-right">{game.date}</span>
         </div>
-      ))}
+        <div className="venue">{game.venue}</div>
 
-      <Loud onClick={share}>Share the trip</Loud>
-      <Quiet onClick={onSpinAgain}>Spin again</Quiet>
-    </div>
+        <div className="section">
+          <div className="section-head section-head--scarlet">The town</div>
+          {game.facts.map((f, i) => (
+            <p className="fact" key={i}>{f}</p>
+          ))}
+        </div>
+
+        <div className="section">
+          <div className="section-head section-head--navy">While you’re there</div>
+          {game.todo.map((t, i) => (
+            <div className="todo" key={i}>
+              <span className="todo-num">{String(i + 1).padStart(2, '0')}</span>
+              <span className="todo-text">{t}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="landing">
+          <Loud onClick={share}>Share the trip</Loud>
+          <Quiet onClick={onSpinAgain}>Spin again</Quiet>
+        </div>
+      </div>
+    </>
   )
 }

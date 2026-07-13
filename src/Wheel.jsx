@@ -1,191 +1,220 @@
 import { useEffect, useRef, useState } from 'react'
 import { Header, Strip, Kicker, Loud, Quiet } from './Frame'
-import { teamById, cityForGame, fmtDate } from './data'
 
-const SLICE_COLORS = ['#C8102E', '#1C1C1C', '#D9A441', '#1B3A5C']
-const R = 100
-const DURATION = 5500 // ~5.5 seconds, heavy ease-out. Locked Session 2.
+// ---------------------------------------------------------------------------
+// AWAY DAY — THE WHEEL
+// The only moving part in the app.
+//
+// It is handed a small, fixed set of games (nine, or the whole slate if the
+// slate was already nine or fewer). It knows nothing about the deal.
+// ---------------------------------------------------------------------------
 
-// Label runs RADIALLY — anchored at the rim, reading in along the slice's
-// centreline. One fixed type size for every city, no stretching: a long name
-// just reaches further toward the hub than a short one.
-const LABEL_OUTER = 94
+const R = 150            // wheel radius
+const CX = 165           // centre
+const CY = 165
+const HUB = 34           // hub radius
+const SPIN_MS = 5500     // heavy ease-out, ~5.5 seconds
+const PALETTE = ['scarlet', 'charcoal', 'gold', 'navy']
 
-const pt = (deg, r) => {
-  const rad = (deg * Math.PI) / 180
-  return [r * Math.sin(rad), -r * Math.cos(rad)]
+const FILL = {
+  scarlet: '#C8102E',
+  charcoal: '#1C1C1C',
+  gold: '#D9A441',
+  navy: '#1B3A5C'
 }
 
-export default function Wheel({ team, games, onBack, onSeeTrip }) {
-  const n = games.length
-  const slice = 360 / n
+// Colour the slices so NO TWO NEIGHBOURS MATCH — including across the wrap,
+// where slice 9 sits back beside slice 1. Works for any slice count.
+function sliceColours(n) {
+  const out = []
+  for (let i = 0; i < n; i++) {
+    let c = PALETTE[i % PALETTE.length]
+    const prev = out[i - 1]
+    const last = i === n - 1
+    if (c === prev || (last && c === out[0])) {
+      c = PALETTE.find(x => x !== prev && !(last && x === out[0])) || c
+    }
+    out.push(c)
+  }
+  return out
+}
 
-  const [rotation, setRotation] = useState(0)
+// A wedge, in degrees clockwise from the top.
+function wedgePath(from, to) {
+  const a = (deg) => {
+    const r = ((deg - 90) * Math.PI) / 180
+    return [CX + R * Math.cos(r), CY + R * Math.sin(r)]
+  }
+  const [x1, y1] = a(from)
+  const [x2, y2] = a(to)
+  const big = to - from > 180 ? 1 : 0
+  return `M ${CX} ${CY} L ${x1} ${y1} A ${R} ${R} 0 ${big} 1 ${x2} ${y2} Z`
+}
+
+const easeOut = (t) => 1 - Math.pow(1 - t, 4) // heavy — it hangs at the end
+
+export default function Wheel({ games, teamName, dealt, onResult, onSpinAgain, onDealAgain, onBack }) {
+  const n = games.length
+  const step = 360 / n
+  const colours = sliceColours(n)
+
+  const [rot, setRot] = useState(0)
   const [spinning, setSpinning] = useState(false)
   const [winner, setWinner] = useState(null)
   const [ticker, setTicker] = useState('')
-  const [needle, setNeedle] = useState(0)
+  const [flick, setFlick] = useState(0)
 
-  const raf = useRef(null)
-  const lastIdx = useRef(-1)
+  const raf = useRef(0)
+  const rotRef = useRef(0)
+  const passing = useRef(-1)
 
   useEffect(() => () => cancelAnimationFrame(raf.current), [])
 
-  // Which slice is under the needle right now, and how far through it we are.
-  const idxUnder = (rot) => {
-    const a = (((360 - (rot % 360)) % 360) + 360) % 360
-    return Math.floor(a / slice) % n
-  }
-  const phaseUnder = (rot) => {
-    const a = (((360 - (rot % 360)) % 360) + 360) % 360
-    return (a % slice) / slice
+  // Which slice is sitting under the needle right now?
+  const underNeedle = (r) => {
+    const local = (360 - (r % 360) + 360) % 360
+    return Math.floor(local / step) % n
   }
 
   const spin = () => {
     if (spinning) return
     setWinner(null)
     setSpinning(true)
-    lastIdx.current = -1
 
-    const target = Math.floor(Math.random() * n)
-    const jitter = (Math.random() - 0.5) * (slice - 8)
-    const desired = (360 - ((target + 0.5) * slice + jitter) + 720) % 360
-    const start = rotation
-    const startMod = ((start % 360) + 360) % 360
-    const end = start + 360 * 5 + ((desired - startMod + 360) % 360)
+    const pick = Math.floor(Math.random() * n)
+    const centre = pick * step + step / 2
+    const from = rotRef.current
+    const landing = (360 - ((from + centre) % 360) + 360) % 360
+    const target = from + 360 * 6 + landing
 
     const t0 = performance.now()
-    let prev = start
-    const ease = (p) => 1 - Math.pow(1 - p, 4)
+    let prev = from
 
-    const stepFrame = (now) => {
-      const p = Math.min(1, (now - t0) / DURATION)
-      const rot = start + (end - start) * ease(p)
+    const frame = (now) => {
+      const t = Math.min((now - t0) / SPIN_MS, 1)
+      const r = from + (target - from) * easeOut(t)
 
-      // Needle deflection scales with speed, so the ticking dies away as it slows.
-      const speed = Math.abs(rot - prev)
-      prev = rot
-      const deflect = Math.min(15, speed * 0.75)
-      setNeedle(deflect * Math.sin(phaseUnder(rot) * Math.PI * 2))
-      setRotation(rot)
-
-      const i = idxUnder(rot)
-      if (i !== lastIdx.current) {
-        lastIdx.current = i
-        setTicker(cityForGame(games[i]).city)
+      // Needle deflection scales with speed, and it ticks on every slice edge.
+      const speed = r - prev
+      prev = r
+      const idx = underNeedle(r)
+      if (idx !== passing.current) {
+        passing.current = idx
+        setTicker(games[idx].city)
+        setFlick(Math.min(14, speed * 0.5))
+      } else {
+        setFlick(f => f * 0.82)
       }
 
-      if (p < 1) {
-        raf.current = requestAnimationFrame(stepFrame)
+      rotRef.current = r
+      setRot(r)
+
+      if (t < 1) {
+        raf.current = requestAnimationFrame(frame)
       } else {
-        setNeedle(0)
+        setFlick(0)
         setTicker('')
-        setWinner(target)
         setSpinning(false)
+        setWinner(pick)
       }
     }
-    raf.current = requestAnimationFrame(stepFrame)
+    raf.current = requestAnimationFrame(frame)
   }
 
-  const wonGame = winner === null ? null : games[winner]
-  const wonCity = wonGame ? cityForGame(wonGame) : null
-  const wonOpp = wonGame ? teamById(wonGame.homeTeamId) : null
+  const win = winner === null ? null : games[winner]
 
   return (
-    <div className="app">
-      <Header onBack={onBack} />
-      <Strip left={team.name} right={`${n} Slices`} />
-      <Kicker>
-        {spinning ? 'Fate is deciding' : winner === null ? 'Spin the wheel' : 'Fate picked'}
-      </Kicker>
+    <>
+      <Header onBack={spinning ? undefined : onBack} />
+      <Strip left={teamName} right={`${n} ON THE WHEEL`} />
 
-      <div className="wheel-wrap">
-        <svg className="wheel-svg" viewBox="-112 -122 224 234" role="img" aria-label="Away game wheel">
-          <g transform={`rotate(${rotation})`}>
-            {games.map((g, i) => {
-              const a0 = i * slice
-              const a1 = a0 + slice
-              const [x0, y0] = pt(a0, R)
-              const [x1, y1] = pt(a1, R)
-              const large = slice > 180 ? 1 : 0
-              const mid = a0 + slice / 2
-              // Right half of the wheel reads outward; left half reads inward,
-              // so no label is ever upside down.
-              const leftHalf = mid > 180
-              return (
-                <g key={g.id}>
-                  <path
-                    d={`M 0 0 L ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1} Z`}
-                    fill={SLICE_COLORS[i % SLICE_COLORS.length]}
-                    stroke="#EFE7D6"
-                    strokeWidth="1.5"
-                  />
-                  <g transform={`rotate(${mid})`}>
+      <div className="pad">
+        <Kicker>{win ? 'Fate picked' : spinning ? 'Fate is deciding' : 'Spin it'}</Kicker>
+
+        <div className="wheel-wrap">
+          <svg viewBox="0 0 330 345" className="wheel" role="img" aria-label="The wheel">
+            <g transform={`rotate(${rot} ${CX} ${CY})`}>
+              {games.map((g, i) => {
+                const from = i * step
+                const to = from + step
+                const mid = from + step / 2
+                const angle = mid - 90                      // maths angle, degrees
+                const norm = ((angle % 360) + 360) % 360
+                const flip = norm > 90 && norm < 270         // would read upside-down
+                const rr = R - 12
+                const rad = (angle * Math.PI) / 180
+                const lx = CX + rr * Math.cos(rad)
+                const ly = CY + rr * Math.sin(rad)
+                const c = colours[i]
+                return (
+                  <g key={g.id}>
+                    <path d={wedgePath(from, to)} fill={FILL[c]} stroke="#EFE7D6" strokeWidth="1" />
                     <text
                       className="slice-label"
-                      fill="#EFE7D6"
+                      x={lx}
+                      y={ly}
+                      fill={c === 'gold' ? '#1C1C1C' : '#EFE7D6'}
+                      textAnchor={flip ? 'start' : 'end'}
                       dominantBaseline="middle"
-                      transform={leftHalf ? 'rotate(90) skewX(-10)' : 'rotate(-90) skewX(-10)'}
-                      x={leftHalf ? -LABEL_OUTER : LABEL_OUTER}
-                      textAnchor={leftHalf ? 'start' : 'end'}
+                      transform={`rotate(${flip ? angle + 180 : angle} ${lx} ${ly})`}
                     >
-                      {cityForGame(g).city}
+                      {g.city.toUpperCase()}
                     </text>
                   </g>
-                </g>
-              )
-            })}
-
-            {winner !== null &&
-              (() => {
-                const a0 = winner * slice
-                const a1 = a0 + slice
-                const [x0, y0] = pt(a0, R)
-                const [x1, y1] = pt(a1, R)
-                const large = slice > 180 ? 1 : 0
-                return (
-                  <path
-                    d={`M 0 0 L ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1} Z`}
-                    fill="none"
-                    stroke="#EFE7D6"
-                    strokeWidth="5"
-                  />
                 )
-              })()}
-          </g>
+              })}
+            </g>
 
-          {/* hub — plain cream disc. It caps the eight slice points and says nothing.
-              No monogram, and no scarlet line: it read as an object, not furniture. */}
-          <circle cx="0" cy="0" r="17" fill="#EFE7D6" stroke="#1C1C1C" strokeWidth="2" />
+            {/* The winner's outline is drawn OVER everything — never inside the
+                wedge, or its neighbours paint on top of it. */}
+            {winner !== null && (
+              <g transform={`rotate(${rot} ${CX} ${CY})`} pointerEvents="none">
+                <path
+                  d={wedgePath(winner * step, winner * step + step)}
+                  fill="none"
+                  stroke="#EFE7D6"
+                  strokeWidth="6"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d={wedgePath(winner * step, winner * step + step)}
+                  fill="none"
+                  stroke="#1C1C1C"
+                  strokeWidth="1.5"
+                  strokeLinejoin="round"
+                />
+              </g>
+            )}
 
-          {/* needle — fixed at the top, flicks as slices pass under it */}
-          <g transform={`rotate(${needle})`}>
-            <polygon points="0,-88 -9,-115 9,-115" fill="#1C1C1C" />
-          </g>
-        </svg>
+            {/* Hub — a plain cream disc. It says nothing at all. */}
+            <circle cx={CX} cy={CY} r={HUB} fill="#EFE7D6" stroke="#1C1C1C" strokeWidth="3" />
+
+            {/* Needle, fixed at the top, flicking as slices pass. */}
+            <g transform={`rotate(${flick} ${CX} 18)`}>
+              <path d={`M ${CX - 11} 6 L ${CX + 11} 6 L ${CX} 34 Z`} fill="#1C1C1C" />
+            </g>
+          </svg>
+        </div>
+
+        <div className="ticker">{ticker || '\u00A0'}</div>
+
+        {win ? (
+          <div className="landing">
+            <div className="landing-city">{win.city}</div>
+            <div className="lower-third">
+              <span className="lt-left">AT {win.opponent.toUpperCase()}</span>
+              <span className="lt-right">{win.date}</span>
+            </div>
+            <Loud onClick={() => onResult(win)}>See the trip</Loud>
+            <Quiet onClick={() => { setWinner(null); onSpinAgain && onSpinAgain(); spin() }}>Spin again</Quiet>
+            {dealt && <Quiet onClick={onDealAgain}>Deal again</Quiet>}
+          </div>
+        ) : (
+          <div className="landing">
+            <Loud onClick={spin} disabled={spinning}>{spinning ? 'Spinning' : 'Spin'}</Loud>
+          </div>
+        )}
       </div>
-
-      <div className="ticker">{ticker}</div>
-
-      {wonGame ? (
-        <>
-          <div className="landing-city">
-            <span className="skew">{wonCity.city}</span>
-          </div>
-          <div className="lower-third">
-            <span className="lt-label skew">at {wonOpp.name}</span>
-            <span className="lt-date">{fmtDate(wonGame.date)}</span>
-          </div>
-          <Loud onClick={() => onSeeTrip(wonGame)}>See the trip</Loud>
-          <Quiet onClick={spin} disabled={spinning}>
-            Spin again
-          </Quiet>
-        </>
-      ) : (
-        <Loud onClick={spin} disabled={spinning}>
-          {spinning ? 'Spinning…' : 'Spin'}
-        </Loud>
-      )}
-    </div>
+    </>
   )
 }
