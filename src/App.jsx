@@ -75,7 +75,7 @@ function LeaguePicker({ onPick, onBack }) {
           </button>
         ))}
 
-        <p className="note">NBA joins when its schedule drops.</p>
+        <p className="note">NHL joins on 16 July, when its schedule drops. NBA follows in August.</p>
       </div>
     </>
   )
@@ -113,8 +113,9 @@ function TeamPicker({ leagueId, onPick, onBack }) {
 // ---------------------------------------------------------------------------
 // 4. AWAY SLATE — and THE DEAL
 //
-// THE DEAL DEALS TOWNS, NOT FIXTURES. A 41-game slate visits some cities twice;
-// each city is one candidate on the wheel, never two slices with the same name.
+// THE DEAL DEALS TOWNS, NOT FIXTURES. A slate can visit the same city twice —
+// the Chiefs are in Los Angeles twice, the Jaguars are in London twice. Each
+// city is one candidate on the wheel, never two slices with the same name.
 // If fate deals a town that holds two dates, it takes one of them on the way out.
 //
 // 9 towns or fewer: no deal. The button reads SPIN, every town is a slice.
