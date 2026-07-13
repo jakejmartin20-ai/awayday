@@ -372,6 +372,138 @@ export const CITIES = {
       'The Aztec capital of Tenochtitlan is still down there, under the cathedral.'
     ],
     todo: ['Teotihuac\u00e1n and the pyramids', 'Tacos al pastor, on the street, late', 'Frida Kahlo\u2019s house in Coyoac\u00e1n']
+  },
+
+  // --- NHL CITY CARDS (S11) --------------------------------------------------
+  // Written ahead of the NHL bake. Thirteen towns the NFL never visits.
+  // Buffalo is NOT here: the Bills already gave us that card in S8.
+  // Columbus IS here: the Blue Jackets play in a town the NFL does not go to,
+  // and it was missing from every list until we checked the data.
+  //
+  // Not new cards, by the "town is where you'd book a hotel" rule:
+  //   Sunrise FL (Panthers)  -> miami, 30 miles     [same case as Foxborough]
+  //   St Paul MN (Wild)      -> minneapolis
+  //   Newark NJ (Devils)     -> newyork
+  //   Elmont NY (Islanders)  -> newyork
+  //   Kanata ON (Senators)   -> ottawa, below
+  // ---------------------------------------------------------------------------
+
+  toronto: {
+    city: 'Toronto', state: 'Ontario, Canada', lat: 43.6532, lng: -79.3832,
+    facts: [
+      'The CN Tower was the tallest free-standing structure on earth for over thirty years.',
+      'More than half the people who live here were born outside Canada.',
+      'Insulin was discovered at the university here in 1921.'
+    ],
+    todo: ['Kensington Market on a Sunday', 'St Lawrence Market', 'The islands by ferry, for the skyline back']
+  },
+  montreal: {
+    city: 'Montreal', state: 'Quebec, Canada', lat: 45.5019, lng: -73.5674,
+    facts: [
+      'It is the largest French-speaking city in the Americas.',
+      'A network of tunnels runs for miles under downtown, so you can cross the city in winter without going outside.',
+      'The bagels are boiled in honey water and baked over a wood fire, and people will argue about the bakery for hours.'
+    ],
+    todo: ['Mount Royal at golden hour', 'Smoked meat at a counter in the Plateau', 'Old Montreal on foot']
+  },
+  ottawa: {
+    city: 'Ottawa', state: 'Ontario, Canada', lat: 45.4215, lng: -75.6972,
+    facts: [
+      'The Rideau Canal freezes over every winter into the largest skating rink in the world.',
+      'It became the capital because Queen Victoria chose it as a compromise between Toronto and Quebec City.',
+      'The Parliament buildings burned down in 1916 and were rebuilt in the same Gothic style.'
+    ],
+    todo: ['Skate the Rideau Canal, if the ice is in', 'The National Gallery, and the giant spider outside it', 'ByWard Market']
+  },
+  winnipeg: {
+    city: 'Winnipeg', state: 'Manitoba, Canada', lat: 49.8951, lng: -97.1384,
+    facts: [
+      'It sits closer to the geographic centre of North America than any other big city.',
+      'Winnie the Pooh is named after a bear from here, taken to London Zoo by a Canadian soldier.',
+      'Its winters are among the coldest of any major city on earth, and the place carries on regardless.'
+    ],
+    todo: ['The Forks, where the two rivers meet', 'The Canadian Museum for Human Rights', 'The old warehouses of the Exchange District']
+  },
+  calgary: {
+    city: 'Calgary', state: 'Alberta, Canada', lat: 51.0447, lng: -114.0719,
+    facts: [
+      'The Rocky Mountains begin about an hour west, and Banff is barely further.',
+      'The Stampede every July turns the entire city into a rodeo for ten days.',
+      'A warm wind called the chinook can lift the temperature twenty degrees in an afternoon.'
+    ],
+    todo: ['Banff and Lake Louise, if you can spare the day', 'The Calgary Tower', 'Stephen Avenue after the game']
+  },
+  edmonton: {
+    city: 'Edmonton', state: 'Alberta, Canada', lat: 53.5461, lng: -113.4938,
+    facts: [
+      'Its river valley is the largest stretch of urban parkland in North America.',
+      'West Edmonton Mall was the biggest shopping centre in the world for two decades, and has a rollercoaster and a wave pool inside it.',
+      'It is the northernmost big city on the continent.'
+    ],
+    todo: ['The river valley trails', 'Whyte Avenue in Old Strathcona', 'West Edmonton Mall, once, out of sheer disbelief']
+  },
+  vancouver: {
+    city: 'Vancouver', state: 'British Columbia, Canada', lat: 49.2827, lng: -123.1207,
+    facts: [
+      'You can ski in the mountains and stand on a beach the same afternoon.',
+      'Stanley Park is bigger than Central Park, and most of it is rainforest.',
+      'It rains a great deal, and everybody goes outside anyway.'
+    ],
+    todo: ['The seawall around Stanley Park', 'Granville Island market', 'Grouse Mountain, for the view back over the city']
+  },
+  columbus: {
+    city: 'Columbus', state: 'Ohio', lat: 39.9612, lng: -82.9988,
+    facts: [
+      'It is the biggest city in Ohio, which surprises almost everybody.',
+      'Ohio State has one of the largest campuses in the country, and the whole place fills up on autumn Saturdays.',
+      'German Village, just south of downtown, is thirty-odd streets of brick houses built by 19th-century settlers.'
+    ],
+    todo: ['German Village and the Book Loft', 'The Short North for food and galleries', 'The Scioto Mile along the river']
+  },
+  raleigh: {
+    city: 'Raleigh', state: 'North Carolina', lat: 35.7796, lng: -78.6382,
+    facts: [
+      'It is one corner of the Research Triangle, with Durham and Chapel Hill.',
+      'They call it the City of Oaks, and the streets are shaded by them.',
+      'The state museums downtown are free to walk into.'
+    ],
+    todo: ['The North Carolina Museum of Art and its outdoor park', 'Eastern Carolina barbecue, vinegar not tomato', 'The bars on Glenwood South']
+  },
+  stlouis: {
+    city: 'St. Louis', state: 'Missouri', lat: 38.6270, lng: -90.1994,
+    facts: [
+      'The Gateway Arch is 630 feet tall, and you ride to the top in a tiny pod.',
+      'It held the World\u2019s Fair and the Olympics in the same year, 1904.',
+      'Toasted ravioli was invented here, reportedly by accident.'
+    ],
+    todo: ['The top of the Gateway Arch', 'The City Museum, a converted shoe factory unlike anywhere else', 'Frozen custard at Ted Drewes']
+  },
+  saltlakecity: {
+    city: 'Salt Lake City', state: 'Utah', lat: 40.7608, lng: -111.8910,
+    facts: [
+      'The Great Salt Lake is saltier than the ocean, and you float in it.',
+      'The street grid is counted outward from Temple Square, so an address tells you exactly where you are standing.',
+      'Five national parks sit within a day\u2019s drive.'
+    ],
+    todo: ['Temple Square', 'A drive up one of the Wasatch canyons', 'Skiing, if the season is with you']
+  },
+  sanjose: {
+    city: 'San Jose', state: 'California', lat: 37.3382, lng: -121.8863,
+    facts: [
+      'It is the capital of Silicon Valley, and larger than San Francisco.',
+      'The Winchester Mystery House was built without stopping for 38 years, and has staircases that go nowhere.',
+      'It gets around 300 days of sunshine a year.'
+    ],
+    todo: ['The Winchester Mystery House', 'The Tech Interactive downtown', 'Dinner on Santana Row']
+  },
+  anaheim: {
+    city: 'Anaheim', state: 'California', lat: 33.8366, lng: -117.9143,
+    facts: [
+      'Disneyland opened here in 1955, and the city grew up around it.',
+      'It was founded by German winemakers, and the name means home by the Santa Ana river.',
+      'Huntington Beach and Newport are twenty minutes down the road.'
+    ],
+    todo: ['Disneyland, if anyone will admit to wanting to', 'The Packing District for food', 'Huntington Beach at sunset']
   }
 }
 
