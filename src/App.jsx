@@ -250,6 +250,14 @@ export default function App() {
   const [dealNonce, setDealNonce] = useState(0)
   const [game, setGame] = useState(null)
 
+  // Every screen opens at the top. One page swapping screens in and out means
+  // the browser keeps your scroll position unless we tell it not to.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [screen])
+
   const team = teamId ? teamById(teamId) : null
 
   const pickTeam = (id) => {

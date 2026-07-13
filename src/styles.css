@@ -30,7 +30,15 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-button { font-family: inherit; cursor: pointer; }
+/* iOS Safari paints button text in its own system blue unless we forbid it.
+   Every button in the app inherits charcoal from the body instead. */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  color: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
 
 .app {
   max-width: 480px;
