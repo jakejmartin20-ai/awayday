@@ -36,15 +36,18 @@ export default function Result({ team, game, index, total, onBack, onSpinAgain }
       </div>
       <div className="result-state">{city.state}</div>
 
+      {/* The map is left clean — nothing sits on top of it, including OSM's
+          own attribution, which we are required to leave visible. */}
       <div className="map-cut">
         <iframe title={`Map of ${city.city}`} src={mapSrc} loading="lazy" />
-        <div className="venue-chip skew">{opp.venue}</div>
       </div>
 
       <div className="lower-third">
         <span className="lt-label skew">at {opp.name}</span>
         <span className="lt-date">{fmtDate(game.date)}</span>
       </div>
+
+      <div className="venue-line">{opp.venue}</div>
 
       <div className="section-head">
         <div className="accent accent-scarlet" />

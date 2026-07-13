@@ -6,6 +6,11 @@ const SLICE_COLORS = ['#C8102E', '#1C1C1C', '#D9A441', '#1B3A5C']
 const R = 100
 const DURATION = 5500 // ~5.5 seconds, heavy ease-out. Locked Session 2.
 
+// Label runs RADIALLY — from near the hub out to the rim, along the slice's
+// centreline. That gives even PHILADELPHIA the full length of the slice.
+const LABEL_OUTER = 94
+const LABEL_INNER = 30
+
 const pt = (deg, r) => {
   const rad = (deg * Math.PI) / 180
   return [r * Math.sin(rad), -r * Math.cos(rad)]
@@ -95,7 +100,7 @@ export default function Wheel({ team, games, onBack, onSeeTrip }) {
       </Kicker>
 
       <div className="wheel-wrap">
-        <svg className="wheel-svg" viewBox="-115 -125 230 240" role="img" aria-label="Away game wheel">
+        <svg className="wheel-svg" viewBox="-112 -122 224 234" role="img" aria-label="Away game wheel">
           <g transform={`rotate(${rotation})`}>
             {games.map((g, i) => {
               const a0 = i * slice
@@ -104,7 +109,9 @@ export default function Wheel({ team, games, onBack, onSeeTrip }) {
               const [x1, y1] = pt(a1, R)
               const large = slice > 180 ? 1 : 0
               const mid = a0 + slice / 2
-              const flip = mid > 90 && mid < 270
+              // Right half of the wheel reads outward; left half reads inward,
+              // so no label is ever upside down.
+              const leftHalf = mid > 180
               return (
                 <g key={g.id}>
                   <path
@@ -113,13 +120,16 @@ export default function Wheel({ team, games, onBack, onSeeTrip }) {
                     stroke="#EFE7D6"
                     strokeWidth="1.5"
                   />
-                  <g transform={`rotate(${mid}) translate(0,-64) rotate(${flip ? 180 : 0})`}>
+                  <g transform={`rotate(${mid})`}>
                     <text
                       className="slice-label"
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      transform="skewX(-10)"
                       fill="#EFE7D6"
+                      dominantBaseline="middle"
+                      transform={leftHalf ? 'rotate(90) skewX(-10)' : 'rotate(-90) skewX(-10)'}
+                      x={leftHalf ? -LABEL_OUTER : LABEL_OUTER}
+                      textAnchor={leftHalf ? 'start' : 'end'}
+                      textLength={LABEL_OUTER - LABEL_INNER}
+                      lengthAdjust="spacingAndGlyphs"
                     >
                       {cityForGame(g).city}
                     </text>
@@ -146,13 +156,13 @@ export default function Wheel({ team, games, onBack, onSeeTrip }) {
               })()}
           </g>
 
-          {/* hub — plain cream disc with the scarlet slice-line through it. No monogram. */}
-          <circle cx="0" cy="0" r="20" fill="#EFE7D6" stroke="#1C1C1C" strokeWidth="2" />
-          <rect x="-20" y="-2.5" width="40" height="5" fill="#C8102E" transform="skewX(-10)" />
+          {/* hub — plain cream disc. It caps the eight slice points and says nothing.
+              No monogram, and no scarlet line: it read as an object, not furniture. */}
+          <circle cx="0" cy="0" r="17" fill="#EFE7D6" stroke="#1C1C1C" strokeWidth="2" />
 
           {/* needle — fixed at the top, flicks as slices pass under it */}
           <g transform={`rotate(${needle})`}>
-            <polygon points="0,-90 -9,-118 9,-118" fill="#1C1C1C" />
+            <polygon points="0,-88 -9,-115 9,-115" fill="#1C1C1C" />
           </g>
         </svg>
       </div>
