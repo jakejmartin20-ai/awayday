@@ -7,7 +7,9 @@
 //   3. GAMES  — home team, away team, date, and THE TOWN THE GAME IS PLAYED IN
 //
 // NFL 2026 IS REAL. Baked from the published 272-game regular season.
-// NHL is NOT here yet — its schedule releases 16 July 2026. Never bake a guess.
+// NHL TEAMS and GAMES are NOT here yet — the schedule releases 16 July 2026.
+// Never bake a guess. But the 15 NHL city cards and the arena captions ARE here,
+// written ahead of the bake (S11, S12). They are inert until games reach them.
 //
 // ---------------------------------------------------------------------------
 // THE SLATE RULE — every game NOT PLAYED IN YOUR OWN TOWN.
@@ -504,6 +506,30 @@ export const CITIES = {
       'Huntington Beach and Newport are twenty minutes down the road.'
     ],
     todo: ['Disneyland, if anyone will admit to wanting to', 'The Packing District for food', 'Huntington Beach at sunset']
+  },
+
+  // --- THE NHL GOES ABROAD IN 2026-27 (S12) --------------------------------
+  // Two Global Series, four clubs, two towns none of them live in. Under the
+  // slate rule these land on FOUR wheels: Carolina and Seattle both get
+  // HELSINKI; Chicago and Ottawa both get DUSSELDORF. Written before the bake
+  // so that fate cannot land on a blank screen.
+  helsinki: {
+    city: 'Helsinki', state: 'Finland', lat: 60.1699, lng: 24.9384,
+    facts: [
+      'Suomenlinna, the sea fortress spread across six islands in the harbour, has stood since the 1700s and is a UNESCO World Heritage Site.',
+      'The Rock Church was blasted straight out of the granite in 1969. It has no bells - the ringing is played through loudspeakers.',
+      'Finnish sauna culture is on the UNESCO heritage list, and the public saunas here sit right on the water, so you go from the steam straight into the Baltic.'
+    ],
+    todo: ['The ferry to Suomenlinna, fifteen minutes from the market square', 'A seafront sauna, then the sea', 'Temppeliaukio, the church cut into rock']
+  },
+  dusseldorf: {
+    city: 'Düsseldorf', state: 'Germany', lat: 51.2277, lng: 6.7735,
+    facts: [
+      'The old town crams more than 250 bars into half a square kilometre, which is why they call it the longest bar in the world.',
+      'Altbier is the local drink - dark, copper, top-fermented, brewed here since the 1800s and almost nowhere else.',
+      'It has the largest Japanese community in Germany, centred on Immermannstrasse, where the ramen counters are the real thing.'
+    ],
+    todo: ['The Altstadt on foot, one Alt at a time', 'Immermannstrasse for ramen', 'The Rhine promenade at sunset']
   }
 }
 
@@ -850,7 +876,14 @@ const VENUE_NOTES = {
   'SoFi Stadium': 'Inglewood, 10 miles',
   'Northwest Stadium': 'Landover, 10 miles',
   'MetLife Stadium': 'East Rutherford, New Jersey, 9 miles',
-  'Stade de France': 'Saint-Denis, 6 miles'
+  'Stade de France': 'Saint-Denis, 6 miles',
+
+  // NHL (S11) - the arenas that aren't in the town on the card.
+  'Amerant Bank Arena': 'Sunrise, 30 miles',
+  'Grand Casino Arena': 'St Paul, 11 miles',
+  'Prudential Center': 'Newark, New Jersey, 9 miles',
+  'UBS Arena': 'Elmont, 19 miles',
+  'Canadian Tire Centre': 'Kanata, 15 miles'
 }
 
 const venueLine = (venue) => VENUE_NOTES[venue] ? `${venue} \u00b7 ${VENUE_NOTES[venue]}` : venue
