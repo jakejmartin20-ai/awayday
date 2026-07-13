@@ -1,1 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Away Day — The Deal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#EFE7D6; --charcoal:#1C1C1C; --scarlet:#C8102E;
+    --gold:#D9A441; --navy:#1B3A5C; --line:#CFC3A8; --muted:#8A7C60;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--cream);}
+  body{
+    font-family:'Oswald','Arial Narrow',sans-serif;
+    color:var(--charcoal);
+    -webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #app{max-width:430px;margin:0 auto;padding-bottom:40px;position:relative;overflow-x:hidden}
+  .sk{display:inline-block;transform:skewX(-10deg)}
 
+  .head{display:flex;align-items:center;gap:8px;padding:14px 14px 10px}
+  .wordmark{font-size:26px;font-weight:700;letter-spacing:1px}
+  .bar{flex:1;height:9px;background:var(--scarlet)}
+
+  .tabs{display:flex;gap:0;padding:0 14px 10px}
+  .tab{flex:1;text-align:center;font-size:13px;font-weight:700;letter-spacing:2px;
+       padding:9px 0;border:2px solid var(--charcoal);background:var(--cream);color:var(--muted);cursor:pointer}
+  .tab.on{background:var(--charcoal);color:var(--cream)}
+
+  .strip{background:var(--charcoal);display:flex;justify-content:space-between;align-items:center;padding:7px 14px}
+  .strip .l{color:var(--cream);font-size:13px;font-weight:500;letter-spacing:1.5px}
+  .strip .r{color:var(--gold);font-size:13px;font-weight:700;letter-spacing:1.5px}
+
+  .kick{font-size:11px;letter-spacing:3px;color:var(--muted);font-weight:500;padding:12px 14px 6px}
+  .pad{padding:0 14px}
+
+  .cta{width:100%;text-align:center;font-size:20px;font-weight:700;letter-spacing:2px;
+       padding:15px 0;margin-top:10px;cursor:pointer;user-select:none;
+       background:var(--scarlet);color:var(--cream);border:2px solid var(--charcoal)}
+  .cta:active{transform:translateY(1px)}
+  .cta.q{background:var(--cream);color:var(--charcoal);font-size:15px;padding:11px 0}
+  .cta.off{background:var(--line);color:var(--muted);border-color:var(--muted);cursor:default}
+  .cta.off:active{transform:none}
+
+  #list{max-height:300px;overflow-y:auto;border-top:2px solid var(--charcoal);border-bottom:2px solid var(--charcoal)}
+  .row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);
+       background:var(--cream);transition:background .1s linear}
+  .row:last-child{border-bottom:0}
+  .row.flash{background:var(--gold)}
+  .row.pick{background:var(--scarlet)}
+  .row.pick .opp,.row.pick .dt{color:var(--cream)}
+  .chip{background:var(--charcoal);color:var(--gold);font-size:12px;font-weight:700;
+        letter-spacing:.5px;padding:3px 6px;min-width:28px;text-align:center}
+  .opp{flex:1;font-size:16px;font-weight:700;letter-spacing:.5px}
+  .dt{font-size:12px;font-weight:500;color:var(--navy);letter-spacing:1px}
+
+  .note{font-size:11px;letter-spacing:2px;color:var(--muted);font-weight:500;padding:12px 14px 0}
+
+  .fly{position:absolute;z-index:9;pointer-events:none;background:var(--scarlet);color:var(--cream);
+       border:2px solid var(--charcoal);font-size:13px;font-weight:700;letter-spacing:1px;
+       padding:7px 9px;width:170px;white-space:nowrap;overflow:hidden;
+       transition:transform 1s cubic-bezier(.2,.7,.2,1),opacity .45s linear}
+
+  .ticker{text-align:center;height:24px;margin-top:6px;font-size:14px;font-weight:700;
+          letter-spacing:2px;color:var(--muted)}
+  .city{font-size:38px;font-weight:700;color:var(--scarlet);letter-spacing:1px;line-height:1;margin-top:4px}
+  .lower{background:var(--charcoal);display:flex;justify-content:space-between;padding:9px 12px;margin-top:10px}
+  .lower .a{color:var(--cream);font-size:14px;font-weight:700;letter-spacing:1px}
+  .lower .b{color:var(--gold);font-size:14px;font-weight:700;letter-spacing:1px}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="head">
+    <span class="wordmark sk">AWAY DAY</span>
+    <span class="bar"></span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on sk" id="tab1">MODE 1 · TEAM</div>
+    <div class="tab sk" id="tab2">MODE 2 · DART</div>
+  </div>
+
+  <!-- ================= MODE 1 ================= -->
+  <div id="m1">
+    <div class="strip">
+      <span class="l sk">SEATTLE KRAKEN</span>
+      <span class="r sk" id="cnt1">41 GAMES</span>
+    </div>
+
+    <div id="slate">
+      <div class="kick">YOUR AWAY SLATE</div>
+      <div id="list"></div>
+      <div class="note">FATE DEALS NINE OF THESE ONTO THE WHEEL.</div>
+      <div class="pad"><div class="cta sk" id="deal1">DEAL THE WHEEL</div></div>
+    </div>
+
+    <div id="wheel1" class="hide">
+      <div class="kick">NINE DEALT · ONE LANDS</div>
+      <div id="stage1" class="pad"></div>
+      <div class="ticker" id="tick1">&nbsp;</div>
+      <div class="pad">
+        <div id="land1" class="hide">
+          <div class="city sk" id="city1"></div>
+          <div class="lower"><span class="a sk" id="opp1"></span><span class="b sk" id="date1"></span></div>
+        </div>
+        <div class="cta sk" id="spin1">SPIN</div>
+        <div class="cta q sk hide" id="again1">SPIN AGAIN</div>
+        <div class="cta q sk hide" id="redeal1">DEAL AGAIN</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODE 2 ================= -->
+  <div id="m2" class="hide">
+    <div class="strip">
+      <span class="l sk">NOV 6–15 · ANY SPORT</span>
+      <span class="r sk" id="cnt2">318 GAMES</span>
+    </div>
+    <div class="kick" id="kick2">THE COUNTRY IS IN PLAY</div>
+    <div id="stage2"></div>
+    <div class="ticker" id="tick2">&nbsp;</div>
+    <div class="pad">
+      <div id="land2" class="hide">
+        <div class="city sk" id="city2"></div>
+        <div class="lower"><span class="a sk" id="opp2"></span><span class="b sk" id="date2"></span></div>
+      </div>
+      <div class="cta sk" id="deal2">DEAL THE MAP</div>
+      <div class="cta q sk hide" id="again2">SPIN AGAIN</div>
+      <div class="cta q sk hide" id="redeal2">DEAL AGAIN</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var CREAM='#EFE7D6', CHAR='#1C1C1C', SCAR='#C8102E', GOLD='#D9A441', NAVY='#1B3A5C', SAND='#E4D9C1';
+  var COL=[SCAR,CHAR,GOLD,NAVY];
+  var R=132, CX=150, CY=150, N=9;
+  var $=function(id){return document.getElementById(id);};
+
+  /* ---------- dummy data ---------- */
+  var SLATE=[
+    ["ANAHEIM DUCKS","ANAHEIM","OCT 9"],["LOS ANGELES KINGS","LOS ANGELES","OCT 11"],
+    ["VEGAS GOLDEN KNIGHTS","LAS VEGAS","OCT 15"],["COLORADO AVALANCHE","DENVER","OCT 18"],
+    ["DALLAS STARS","DALLAS","OCT 22"],["ST. LOUIS BLUES","ST. LOUIS","OCT 24"],
+    ["CHICAGO BLACKHAWKS","CHICAGO","OCT 27"],["MINNESOTA WILD","ST. PAUL","OCT 30"],
+    ["SAN JOSE SHARKS","SAN JOSE","NOV 2"],["UTAH MAMMOTH","SALT LAKE CITY","NOV 5"],
+    ["NASHVILLE PREDATORS","NASHVILLE","NOV 8"],["DETROIT RED WINGS","DETROIT","NOV 11"],
+    ["COLUMBUS BLUE JACKETS","COLUMBUS","NOV 13"],["BUFFALO SABRES","BUFFALO","NOV 16"],
+    ["BOSTON BRUINS","BOSTON","NOV 19"],["NEW YORK RANGERS","NEW YORK","NOV 22"],
+    ["NEW JERSEY DEVILS","NEWARK","NOV 24"],["PHILADELPHIA FLYERS","PHILADELPHIA","NOV 27"],
+    ["PITTSBURGH PENGUINS","PITTSBURGH","NOV 30"],["WASHINGTON CAPITALS","WASHINGTON","DEC 3"],
+    ["CAROLINA HURRICANES","RALEIGH","DEC 6"],["TAMPA BAY LIGHTNING","TAMPA","DEC 9"],
+    ["FLORIDA PANTHERS","SUNRISE","DEC 11"],["NEW YORK ISLANDERS","ELMONT","DEC 14"],
+    ["VEGAS GOLDEN KNIGHTS","LAS VEGAS","DEC 19"],["SAN JOSE SHARKS","SAN JOSE","DEC 22"],
+    ["LOS ANGELES KINGS","LOS ANGELES","DEC 28"],["ANAHEIM DUCKS","ANAHEIM","JAN 2"],
+    ["CHICAGO BLACKHAWKS","CHICAGO","JAN 7"],["DALLAS STARS","DALLAS","JAN 10"],
+    ["COLORADO AVALANCHE","DENVER","JAN 14"],["MINNESOTA WILD","ST. PAUL","JAN 18"],
+    ["UTAH MAMMOTH","SALT LAKE CITY","JAN 23"],["ST. LOUIS BLUES","ST. LOUIS","FEB 3"],
+    ["NASHVILLE PREDATORS","NASHVILLE","FEB 7"],["BOSTON BRUINS","BOSTON","FEB 12"],
+    ["PITTSBURGH PENGUINS","PITTSBURGH","FEB 25"],["DETROIT RED WINGS","DETROIT","MAR 2"],
+    ["VEGAS GOLDEN KNIGHTS","LAS VEGAS","MAR 9"],["SAN JOSE SHARKS","SAN JOSE","MAR 18"],
+    ["LOS ANGELES KINGS","LOS ANGELES","APR 4"]
+  ];
+
+  var POOL=[
+    ["SEATTLE",24,34,"NHL · KRAKEN","NOV 8"],["PORTLAND",20,46,"USL · TIMBERS 2","NOV 9"],
+    ["SAN FRANCISCO",26,78,"NBA · WARRIORS","NOV 12"],["LOS ANGELES",44,105,"NHL · KINGS","NOV 7"],
+    ["LAS VEGAS",52,92,"NFL · RAIDERS","NOV 15"],["BOISE",48,52,"ECHL · STEELHEADS","NOV 11"],
+    ["SALT LAKE CITY",68,70,"NBA · JAZZ","NOV 13"],["DENVER",92,78,"NHL · AVALANCHE","NOV 10"],
+    ["PHOENIX",62,110,"NBA · SUNS","NOV 14"],["ALBUQUERQUE",85,100,"USL · NEW MEXICO","NOV 8"],
+    ["OKLAHOMA CITY",118,100,"NBA · THUNDER","NOV 9"],["DALLAS",120,120,"NHL · STARS","NOV 12"],
+    ["SAN ANTONIO",115,135,"NBA · SPURS","NOV 7"],["HOUSTON",130,128,"NFL · TEXANS","NOV 15"],
+    ["NEW ORLEANS",160,130,"NBA · PELICANS","NOV 11"],["KANSAS CITY",130,80,"NFL · CHIEFS","NOV 8"],
+    ["OMAHA",125,65,"AHL · STORM","NOV 13"],["MINNEAPOLIS",140,50,"NHL · WILD","NOV 10"],
+    ["CHICAGO",165,65,"NHL · BLACKHAWKS","NOV 14"],["ST. LOUIS",150,85,"NHL · BLUES","NOV 9"],
+    ["MEMPHIS",155,100,"NBA · GRIZZLIES","NOV 12"],["NASHVILLE",175,95,"NFL · TITANS","NOV 8"],
+    ["ATLANTA",190,105,"NBA · HAWKS","NOV 7"],["TOLEDO",185,65,"ECHL · WALLEYE","NOV 11"],
+    ["DETROIT",190,58,"NHL · RED WINGS","NOV 13"],["CLEVELAND",198,68,"NFL · BROWNS","NOV 15"],
+    ["PITTSBURGH",208,72,"NHL · PENGUINS","NOV 9"],["BUFFALO",215,58,"NHL · SABRES","NOV 12"],
+    ["HERSHEY",232,72,"AHL · BEARS","NOV 10"],["PHILADELPHIA",240,74,"NFL · EAGLES","NOV 8"],
+    ["NEW YORK",248,66,"NBA · KNICKS","NOV 14"],["BOSTON",260,56,"NHL · BRUINS","NOV 11"],
+    ["WASHINGTON",230,84,"NHL · CAPITALS","NOV 13"],["RALEIGH",220,95,"NHL · HURRICANES","NOV 7"],
+    ["CHARLESTON",212,112,"USL · BATTERY","NOV 15"],["TAMPA",208,145,"NHL · LIGHTNING","NOV 9"],
+    ["MIAMI",216,158,"NBA · HEAT","NOV 12"]
+  ];
+
+  var US="M18,28 L14,46 L22,62 L30,80 L40,96 L54,112 L68,128 L88,132 L104,142 L118,140 "+
+         "L126,152 L142,150 L152,158 L164,150 L178,152 L196,150 L204,152 L214,174 L220,150 "+
+         "L234,142 L246,130 L258,116 L268,100 L280,72 L262,62 L242,58 L224,52 L212,62 "+
+         "L198,52 L182,60 L168,50 L150,44 L120,38 L90,32 L50,28 Z";
+
+  /* ---------- shared wheel drawing ---------- */
+  function wedges(cities, ang, sel, opacity){
+    var o=['<g opacity="'+opacity+'" transform="rotate('+ang+' '+CX+' '+CY+')">'], i;
+    for(i=0;i<N;i++){
+      var a0=(i*40-90)*Math.PI/180, a1=((i+1)*40-90)*Math.PI/180;
+      o.push('<path d="M'+CX+' '+CY+' L'+(CX+R*Math.cos(a0)).toFixed(1)+' '+(CY+R*Math.sin(a0)).toFixed(1)+
+             ' A'+R+' '+R+' 0 0 1 '+(CX+R*Math.cos(a1)).toFixed(1)+' '+(CY+R*Math.sin(a1)).toFixed(1)+' Z" '+
+             'fill="'+COL[i%4]+'" stroke="'+CREAM+'" stroke-width="'+(sel===i?6:1.5)+'"/>');
+    }
+    for(i=0;i<N;i++){
+      var mid=i*40+20, flip=mid>180, fill=(i%4===2)?CHAR:CREAM;
+      o.push('<text transform="translate('+CX+','+CY+') rotate('+mid+') translate(0,'+(-(R-9))+') rotate('+(flip?-90:90)+')" '+
+             'text-anchor="'+(flip?'end':'start')+'" y="3.2" font-family="Oswald,Arial Narrow,sans-serif" '+
+             'font-size="11" font-weight="700" letter-spacing="1" fill="'+fill+'">'+cities[i][0]+'</text>');
+    }
+    o.push('</g>');
+    return o.join('');
+  }
+  function wheelSVG(cities, ang, sel, needle){
+    var o=['<svg viewBox="0 0 300 300" width="100%" style="display:block">'];
+    o.push(wedges(cities, ang, sel, 1));
+    o.push('<circle cx="'+CX+'" cy="'+CY+'" r="27" fill="'+CREAM+'" stroke="'+CHAR+'" stroke-width="3"/>');
+    o.push('<polygon points="150,28 140,6 160,6" fill="'+CHAR+'" transform="rotate('+(needle||0)+' 150 10)"/>');
+    o.push('</svg>');
+    return o.join('');
+  }
+
+  /* spin engine — shared by both modes */
+  function runSpin(opts){
+    var from = opts.ang % 360;
+    var win  = Math.floor(Math.random()*N);
+    var T    = 1800 + (360 - (win*40+20)) + Math.random()*6;
+    var t0=null, last=-1, DUR=5500;
+    function frame(ts){
+      if(!t0) t0=ts;
+      var t=Math.min((ts-t0)/DUR,1);
+      var e=1-Math.pow(1-t,4);
+      var ang=from+T*e;
+      var v=(T*4*Math.pow(1-t,3))/DUR;
+      opts.render(ang, -1, Math.min(v*2.2,16));
+      var idx=Math.floor((((-ang+20)%360)+360)%360/40);
+      if(idx!==last){ last=idx; opts.tick(opts.cities[(N-idx)%N][0]); }
+      if(t<1){ requestAnimationFrame(frame); }
+      else { opts.tick(''); opts.render(ang, win, 0); opts.done(win, ang); }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ================= MODE 1 ================= */
+  var list=$('list'), app=$('app'), ang1=0, dealt1=[];
+
+  SLATE.forEach(function(g,i){
+    var d=document.createElement('div');
+    d.className='row'; d.id='r'+i;
+    d.innerHTML='<span class="chip sk">'+(i<9?'0':'')+(i+1)+'</span>'+
+                '<span class="opp sk">'+g[0]+'</span>'+
+                '<span class="dt sk">'+g[2]+'</span>';
+    list.appendChild(d);
+  });
+
+  function render1(ang, sel, needle){
+    $('stage1').innerHTML = wheelSVG(dealt1, ang, sel, needle);
+    ang1 = ang;
+  }
+
+  function deal1(){
+    var b=$('deal1');
+    b.className='cta sk off'; b.textContent='DEALING…';
+    var n=0;
+    var iv=setInterval(function(){
+      var r=$('r'+Math.floor(Math.random()*SLATE.length));
+      r.classList.add('flash');
+      setTimeout(function(){ r.classList.remove('flash'); }, 90);
+      list.scrollTop=Math.random()*(list.scrollHeight-300);
+      if(++n>13){ clearInterval(iv); choose1(); }
+    },95);
+  }
+
+  function choose1(){
+    var pool=SLATE.map(function(_,i){return i;}), pick=[];
+    for(var k=0;k<N;k++){ pick.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]); }
+    pick.sort(function(a,b){return a-b;});
+    dealt1 = pick.map(function(i){ return [SLATE[i][1], SLATE[i][0], SLATE[i][2]]; });
+    var n=0;
+    (function step(){
+      if(n>=N){ setTimeout(toWheel1, 750); return; }
+      var i=pick[n], row=$('r'+i);
+      list.scrollTop = row.offsetTop - 120;
+      row.classList.add('pick');
+      var rr=row.getBoundingClientRect(), ar=app.getBoundingClientRect();
+      var f=document.createElement('div');
+      f.className='fly sk';
+      f.textContent=SLATE[i][0];
+      f.style.left=(rr.left-ar.left+10)+'px';
+      f.style.top=(rr.top-ar.top)+'px';
+      app.appendChild(f);
+      (function(el, idx, sx, sy){
+        requestAnimationFrame(function(){
+          el.style.transform='translate('+(100-sx)+'px,'+(330-sy+idx*4)+'px) rotate('+(idx*3-12)+'deg) scale(.82)';
+        });
+        setTimeout(function(){ el.style.opacity=0; }, 1150);
+      })(f, n, rr.left-ar.left, rr.top-ar.top);
+      n++;
+      setTimeout(step,190);
+    })();
+  }
+
+  function toWheel1(){
+    var flies=document.querySelectorAll('.fly');
+    for(var i=0;i<flies.length;i++){ flies[i].parentNode.removeChild(flies[i]); }
+    $('slate').className='hide';
+    $('wheel1').className='';
+    $('cnt1').textContent='9 ON THE WHEEL';
+    render1(0,-1,0);
+  }
+
+  function spin1(){
+    var b=$('spin1');
+    b.className='cta sk off'; b.textContent='SPINNING…';
+    $('land1').className='hide';
+    $('again1').className='cta q sk hide';
+    $('redeal1').className='cta q sk hide';
+    runSpin({
+      ang: ang1, cities: dealt1,
+      render: render1,
+      tick: function(t){ $('tick1').innerHTML = t || '&nbsp;'; },
+      done: function(win){
+        $('city1').textContent=dealt1[win][0];
+        $('opp1').textContent=dealt1[win][1];
+        $('date1').textContent=dealt1[win][2];
+        $('land1').className='';
+        b.className='cta sk'; b.textContent='SEE THE TRIP';
+        $('again1').className='cta q sk';
+        $('redeal1').className='cta q sk';
+      }
+    });
+  }
+
+  function reset1(){
+    var rows=document.querySelectorAll('.row');
+    for(var i=0;i<rows.length;i++){ rows[i].classList.remove('pick'); }
+    $('wheel1').className='hide';
+    $('land1').className='hide';
+    $('slate').className='';
+    $('cnt1').textContent='41 GAMES';
+    $('spin1').textContent='SPIN';
+    $('spin1').className='cta sk';
+    ang1=0; list.scrollTop=0;
+    var b=$('deal1'); b.className='cta sk'; b.textContent='DEAL THE WHEEL';
+  }
+
+  $('deal1').onclick=function(){ if($('deal1').className.indexOf('off')<0) deal1(); };
+  $('spin1').onclick=function(){ if($('spin1').textContent==='SPIN') spin1(); };
+  $('again1').onclick=spin1;
+  $('redeal1').onclick=function(){ reset1(); deal1(); };
+
+  /* ================= MODE 2 ================= */
+  var ang2=0, dealt2=[];
+
+  function mapSVG(pins, morph){
+    var o=['<svg viewBox="0 0 300 300" width="100%" style="display:block">'];
+    o.push('<g transform="translate(6,58)" opacity="'+(1-morph)+'">'+
+           '<path d="'+US+'" fill="'+SAND+'" stroke="'+CHAR+'" stroke-width="2"/></g>');
+    if(morph>0 && dealt2.length===N){ o.push(wedges(dealt2, ang2, -1, morph)); }
+    for(var i=0;i<pins.length;i++){
+      var x=pins[i][1]+6, y=pins[i][2]+58;
+      if(morph>0 && pins.length===N){
+        var a=(i*40+20-90)*Math.PI/180;
+        var tx=CX+(R-16)*Math.cos(a), ty=CY+(R-16)*Math.sin(a);
+        x=x+(tx-x)*morph; y=y+(ty-y)*morph;
+      }
+      o.push('<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5.5" fill="'+SCAR+
+             '" stroke="'+CREAM+'" stroke-width="1.6"/>');
+    }
+    o.push('</svg>');
+    return o.join('');
+  }
+
+  function render2(ang, sel, needle){
+    $('stage2').innerHTML = wheelSVG(dealt2, ang, sel, needle);
+    ang2 = ang;
+  }
+
+  function deal2(){
+    var b=$('deal2');
+    b.className='cta sk off'; b.textContent='DEALING…';
+    $('land2').className='hide';
+    $('again2').className='cta q sk hide';
+    $('redeal2').className='cta q sk hide';
+    $('kick2').textContent='THE COUNTRY IS IN PLAY';
+    $('cnt2').textContent='318 GAMES';
+    var n=0;
+    var iv=setInterval(function(){
+      var fake=[];
+      for(var i=0;i<12;i++){ fake.push(POOL[Math.floor(Math.random()*POOL.length)]); }
+      $('stage2').innerHTML = mapSVG(fake, 0);
+      if(++n>11){ clearInterval(iv); pop2(); }
+    },85);
+  }
+
+  function pop2(){
+    var pool=POOL.slice();
+    dealt2=[];
+    var n=0;
+    (function step(){
+      if(n>=N){
+        $('cnt2').textContent='9 IN PLAY';
+        setTimeout(morph2, 650);
+        return;
+      }
+      dealt2.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);
+      $('stage2').innerHTML = mapSVG(dealt2, 0);
+      n++;
+      setTimeout(step, 90);
+    })();
+  }
+
+  function morph2(){
+    $('kick2').textContent='NINE DEALT · ONE LANDS';
+    ang2=0;
+    var t0=null;
+    function frame(ts){
+      if(!t0) t0=ts;
+      var t=Math.min((ts-t0)/900,1);
+      var e=t*t*(3-2*t);
+      $('stage2').innerHTML = mapSVG(dealt2, e);
+      if(t<1){ requestAnimationFrame(frame); }
+      else {
+        render2(0,-1,0);
+        var b=$('deal2');
+        b.className='cta sk'; b.textContent='SPIN';
+        b.onclick=spin2;
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function spin2(){
+    var b=$('deal2');
+    b.className='cta sk off'; b.textContent='SPINNING…';
+    $('land2').className='hide';
+    $('again2').className='cta q sk hide';
+    $('redeal2').className='cta q sk hide';
+    runSpin({
+      ang: ang2, cities: dealt2,
+      render: render2,
+      tick: function(t){ $('tick2').innerHTML = t || '&nbsp;'; },
+      done: function(win){
+        $('city2').textContent=dealt2[win][0];
+        $('opp2').textContent=dealt2[win][3];
+        $('date2').textContent=dealt2[win][4];
+        $('land2').className='';
+        b.className='cta sk'; b.textContent='SEE THE TRIP'; b.onclick=null;
+        $('again2').className='cta q sk';
+        $('redeal2').className='cta q sk';
+      }
+    });
+  }
+
+  $('deal2').onclick=deal2;
+  $('again2').onclick=spin2;
+  $('redeal2').onclick=function(){
+    dealt2=[]; ang2=0;
+    $('stage2').innerHTML = mapSVG([],0);
+    $('deal2').onclick=deal2;
+    deal2();
+  };
+  $('stage2').innerHTML = mapSVG([],0);
+
+  /* ---------- tabs ---------- */
+  $('tab1').onclick=function(){
+    $('tab1').className='tab on sk'; $('tab2').className='tab sk';
+    $('m1').className=''; $('m2').className='hide';
+  };
+  $('tab2').onclick=function(){
+    $('tab2').className='tab on sk'; $('tab1').className='tab sk';
+    $('m2').className=''; $('m1').className='hide';
+  };
+})();
+</script>
+</body>
+</html>
