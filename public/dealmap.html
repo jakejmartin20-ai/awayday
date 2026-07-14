@@ -179,9 +179,9 @@
       <div class="h">Mockup harness &mdash; not part of the app</div>
       <div class="chips">
         <button class="chip on" data-pool="us">An ordinary weekend</button>
-        <button class="chip" data-pool="helsinki">The Helsinki weekend</button>
-        <button class="chip" data-pool="melbourne">The Melbourne weekend</button>
         <button class="chip" data-pool="tight">A tight regional deal</button>
+        <button class="chip" data-pool="wide">A coast-to-coast deal</button>
+        <button class="chip" data-pool="jax">Mode 1 &mdash; the Jaguars</button>
       </div>
       <div class="note" id="note"></div>
     </div>
@@ -355,26 +355,42 @@ let dealt = [], pins = [], colours = [], rot = 0, spinning = false, poolKey = 'u
 
 const KEYS = Object.keys(CARDS);
 
-// The home pool is COMPUTED FROM THE COORDINATES, not from a list I typed.
-// I typed one first and it was wrong: I forgot LONDON and MADRID. There are
-// EIGHT towns outside North America already baked and live today — London,
-// Madrid, Paris, Munich, Dusseldorf, Helsinki, Rio, Melbourne — and the NBA
-// will bring more. A box round the continent cannot go stale. A list can.
+// -------------------------------------------------------------------------
+// MODE 2'S POOL IS US + CANADA (S18, Jake's call).
+//
+// Nine cards are international: London, Madrid, Paris, Munich, Dusseldorf,
+// Helsinki, Rio, Melbourne, Mexico City. They stay in the app — they are on
+// FIFTEEN NFL clubs' slates and four NHL clubs' — but MODE 1 KEEPS THEM AND
+// MODE 2 DOES NOT. If you CHOSE the Jaguars, London is the prize. If all you
+// said was "I'm free that weekend", fate does not get to book you Melbourne.
+//
+// In the app this is `intl: true` on the card. Mode 1 ignores the key, so
+// NOTHING SHIPPED CHANGES. Mode 2 filters on it. Reversible by deleting it.
+//
+// COMPUTED FROM THE COORDINATES, not from a list I typed. I typed one first
+// and it was wrong — I forgot London and Madrid. A list goes stale the moment
+// the NBA adds a game in Abu Dhabi. A box round the continent does not.
 // (S6: never draw from memory what can be generated from data.)
-const inNorthAmerica = k => {
+// -------------------------------------------------------------------------
+const isDomestic = k => {
   const c = CARDS[k];
-  return c.lng >= -170 && c.lng <= -50 && c.lat >= 14 && c.lat <= 72;
+  return c.lng >= -170 && c.lng <= -50 && c.lat >= 24 && c.lat <= 72;  // US + Canada
 };
-const US = KEYS.filter(inNorthAmerica);
-const TIGHT = ['toledo','detroit','cleveland','columbus','fortwayne','grandrapids','lansing','akron','dayton'];
+const US = KEYS.filter(isDomestic);
 
+// Fixed decks, so the same deal can be looked at twice.
+const TIGHT = ['toledo','detroit','cleveland','columbus','fortwayne','grandrapids','lansing','akron','dayton'];
+const WIDE  = ['seattle','sandiego','denver','austin','minneapolis','tampa','boston','vancouver','montreal'];
+// Mode 1: the ONLY NFL club that fires the deal. Its slate has LONDON on it twice.
+const JAX   = ['london','philadelphia','houston','cleveland','buffalo','denver','nashville','indianapolis','newyork'];
+
+const DECKS = { tight: TIGHT, wide: WIDE, jax: JAX };
 function pickNine() {
-  if (poolKey === 'tight') return TIGHT.slice(0, N).map(k => ({ key:k, ...CARDS[k] }));
-  const forced = poolKey === 'helsinki' ? ['helsinki'] : poolKey === 'melbourne' ? ['melbourne'] : [];
+  const deck = DECKS[poolKey];
+  if (deck) return deck.slice(0, N).map(k => ({ key:k, ...CARDS[k] }));
   const rest = US.slice();
   for (let i = rest.length - 1; i > 0; i--) { const j = (Math.random()*(i+1))|0; [rest[i],rest[j]]=[rest[j],rest[i]]; }
-  const keys = forced.concat(rest.slice(0, N - forced.length));
-  return keys.map(k => ({ key:k, ...CARDS[k] }));
+  return rest.slice(0, N).map(k => ({ key:k, ...CARDS[k] }));
 }
 
 // -------------------------------------------------------------------------
@@ -543,11 +559,13 @@ document.querySelectorAll('.chip').forEach(c => {
     document.querySelectorAll('.chip').forEach(x => x.classList.remove('on'));
     c.classList.add('on');
     poolKey = c.dataset.pool;
-    stripL.textContent = poolKey === 'helsinki' ? 'Fri 13 \u2013 Sun 15 Nov'
-                       : poolKey === 'melbourne' ? 'Sat 24 \u2013 Sun 25 Oct'
-                       : poolKey === 'tight'     ? 'Sat 8 \u2013 Sun 9 Aug'
+    stripL.textContent = poolKey === 'jax'   ? 'Jacksonville Jaguars'
+                       : poolKey === 'tight' ? 'Sat 8 \u2013 Sun 9 Aug'
+                       : poolKey === 'wide'  ? 'Sat 5 \u2013 Sun 6 Sept'
                        : 'Sat 18 \u2013 Sun 19 July';
-    stripR.textContent = poolKey === 'tight' ? '13 towns in play' : '58 towns in play';
+    stripR.textContent = poolKey === 'jax'   ? '10 towns on the slate'
+                       : poolKey === 'tight' ? '13 towns in play'
+                       : '58 towns in play';
     deal();
   };
 });
