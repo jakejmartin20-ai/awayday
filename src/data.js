@@ -14056,6 +14056,8 @@ export function awaySlate(teamId) {
       return {
         id: `${teamId}-${g.date}-${g.cityId}`,
         opponent: opp ? opp.name : oppId,
+        league: LEAGUE_LABEL[team.league] || team.league.toUpperCase(),
+        rank: rankOf(team.league),
         // The lower third. Mode 1 knows who YOU are, so it reads "AT X".
         // Mode 2 does not, so it names both clubs. One field, both modes.
         fixture: `AT ${(opp ? opp.name : oppId).toUpperCase()}`,
@@ -14063,10 +14065,15 @@ export function awaySlate(teamId) {
         cityId: g.cityId,
         city: card.city,
         state: card.state,
+        stateCode: stateCode(card.state),
         lat: card.lat,
         lng: card.lng,
         facts: card.facts,
         todo: card.todo,
+        // 🔴 S20. `date` is a LABEL — 'FRI 17 JUL'. Sorting it puts Friday before
+        // Monday before Saturday. The ISO date is the only thing that ORDERS.
+        //   A FORMATTED FIELD IS NOT A KEY.
+        iso: g.date,
         date: fmt(g.date)
       }
     })
@@ -14097,6 +14104,75 @@ export const SLICES = 9
 
 // ---------------------------------------------------------------------------
 // MODE 2 — OPEN ROAD
+
+// ---------------------------------------------------------------------------
+// 🔴 S20. THREE THINGS THE GAME OBJECT KNEW AND NEVER SAID.
+// ---------------------------------------------------------------------------
+// 1. WHAT SPORT IS THIS. "IOWA CUBS AT TOLEDO MUD HENS" tells you two club names
+//    and leaves you to guess the game. The league was one lookup away the whole
+//    time.
+//
+// 2. WHAT ELSE IS ON. The wheel deals TOWNS (S7). The result screen then pretended
+//    a town had exactly one game — because oneOf() picked one AT RANDOM and threw
+//    the rest away in silence. In a Thursday-to-Monday window only THIRTEEN of
+//    eighty-one towns have a single game; sixty-eight have three or more, and
+//    Anaheim has TEN. The app could hand you a Low-A game twenty-eight miles out
+//    while the Angels were at home that same night, and never mention it.
+//
+//      FATE PICKS THE TOWN. IT DOES NOT PICK YOUR TUESDAY.
+//
+//    The town is the trip; the game is the excuse (S8). Which game you go to is a
+//    travel decision, and the app had been making it for you, with a coin.
+//
+// 3. WHERE THAT TOWN IS. `state: 'Ohio'` on the card; 'OH' on a sign.
+// ---------------------------------------------------------------------------
+const LEAGUE_LABEL = {
+  nfl: 'NFL', nhl: 'NHL', nba: 'NBA', mlb: 'MLB', milb: 'MiLB',
+  mls: 'MLS', uslc: 'USL-C', usl1: 'USL-1'
+}
+// Which game is a town's HEADLINE. Not a coin flip. Unknown leagues sort last
+// rather than sorting FIRST, which is what `undefined` would have done.
+const LEAGUE_RANK = { nfl: 1, nhl: 2, nba: 3, mlb: 4, mls: 5, uslc: 6, usl1: 7, milb: 8 }
+const rankOf = (lg) => LEAGUE_RANK[lg] || 99
+
+// Every state on the 158 cards, read off the file — not typed from memory (S11).
+// Canada carries the country too; a Manitoban is not going to guess "MB".
+const STATE_CODES = {
+  'Alabama': 'AL', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+  'Colorado': 'CO', 'Connecticut': 'CT', 'District of Columbia': 'DC',
+  'Florida': 'FL', 'Georgia': 'GA', 'Idaho': 'ID', 'Illinois': 'IL',
+  'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY',
+  'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA',
+  'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
+  'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+  'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'Ohio': 'OH',
+  'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI',
+  'South Carolina': 'SC', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT',
+  'Virginia': 'VA', 'Washington': 'WA', 'Wisconsin': 'WI',
+  'Alberta, Canada': 'AB, CAN', 'British Columbia, Canada': 'BC, CAN',
+  'Manitoba, Canada': 'MB, CAN', 'Ontario, Canada': 'ON, CAN',
+  'Quebec, Canada': 'QC, CAN'
+}
+// A state we do not know comes back UNCHANGED. It never comes back wrong, and it
+// never comes back blank. (London reads "United Kingdom", which is correct.)
+export const stateCode = (s) => STATE_CODES[s] || s
+
+// A TOWN, not a game. Folds every game on in that town, inside your window, into
+// the ONE object the wheel and the result screen already know how to read.
+export function townObject(games) {
+  const byDate = [...games].sort((a, b) =>
+    a.iso.localeCompare(b.iso) || a.rank - b.rank)
+  const head = [...games].sort((a, b) =>
+    a.rank - b.rank || a.iso.localeCompare(b.iso))[0]
+  return {
+    ...head,
+    games: byDate.map(g => ({
+      league: g.league, fixture: g.fixture, venue: g.venue,
+      iso: g.iso, date: g.date
+    }))
+  }
+}
+
 // ---------------------------------------------------------------------------
 // You do not choose a team. You choose a WINDOW. Fate does the rest.
 //
@@ -14183,15 +14259,22 @@ export function rangeSlate(from, to) {
       return {
         id: `${from}-${to}-${g.date}-${g.cityId}-${g.home}-${g.away}`,
         opponent: home ? home.name : g.home,
+        league: home ? (LEAGUE_LABEL[home.league] || home.league.toUpperCase()) : '',
+        rank: home ? rankOf(home.league) : 99,
         fixture: `${(away ? away.name : g.away).toUpperCase()} AT ${(home ? home.name : g.home).toUpperCase()}`,
         venue: venueLine(g.venue, g.cityId),
         cityId: g.cityId,
         city: card.city,
         state: card.state,
+        stateCode: stateCode(card.state),
         lat: card.lat,
         lng: card.lng,
         facts: card.facts,
         todo: card.todo,
+        // 🔴 S20. `date` is a LABEL — 'FRI 17 JUL'. Sorting it puts Friday before
+        // Monday before Saturday. The ISO date is the only thing that ORDERS.
+        //   A FORMATTED FIELD IS NOT A KEY.
+        iso: g.date,
         date: fmt(g.date)
       }
     })

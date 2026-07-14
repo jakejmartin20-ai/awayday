@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Header, Strip, Kicker, Loud } from './Frame'
 import {
   LEAGUES, SLICES, teamsInLeague, teamById, awaySlate, townsFromSlate,
-  dateBounds, rangeLabel, rangeSlate, townsInRange
+  dateBounds, rangeLabel, rangeSlate, townsInRange, townObject
 } from './data'
 import Wheel from './Wheel'
 import DealMap from './DealMap'
@@ -34,11 +34,13 @@ const shuffled = (arr) => {
   return a
 }
 
-const oneOf = (arr) => arr[Math.floor(Math.random() * arr.length)]
 
 // THE DEAL, in one line. Nine TOWNS, never nine fixtures — a town with two games
 // on is one candidate, and fate takes one of its dates on the way out (S7).
-const dealNine = (games) => shuffled(townsFromSlate(games)).slice(0, SLICES).map(oneOf)
+// 🔴 S20. This used to end in `.map(oneOf)` — a town's games went in, ONE came
+// out, chosen at random, the rest binned without a word. townObject keeps them
+// all. Fate picks the town; it does not pick your Tuesday.
+const dealNine = (games) => shuffled(townsFromSlate(games)).slice(0, SLICES).map(townObject)
 
 // ---------------------------------------------------------------------------
 // 1. MODE PICKER

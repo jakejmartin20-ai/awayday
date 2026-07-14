@@ -35,7 +35,7 @@ export default function Result({ game, title, onSpinAgain, onBack }) {
       <div className="pad">
         <Kicker>Fate picked</Kicker>
         <div className="result-city">{game.city}</div>
-        <div className="result-state">{game.state}</div>
+        <div className="result-state">{game.stateCode}</div>
 
         <div className="map-card">
           <iframe
@@ -47,10 +47,39 @@ export default function Result({ game, title, onSpinAgain, onBack }) {
         </div>
 
         <div className="lower-third">
-          <span className="lt-left">{game.fixture}</span>
-          <span className="lt-right">{game.date}</span>
+          <span className="lt-left">
+            {game.games.length === 1 ? game.fixture : `${game.games.length} games on`}
+          </span>
+          <span className="lt-right">
+            {game.games.length === 1
+              ? game.date
+              : `${game.games[0].date} \u2013 ${game.games[game.games.length - 1].date}`}
+          </span>
         </div>
-        <div className="venue">{game.venue}</div>
+
+        {/* 🔴 S20. WHAT'S ON. The wheel deals a TOWN, and a town is rarely one
+            game — in a Thursday-to-Monday window, sixty-eight towns out of
+            eighty-one have three or more. They were being thrown away by a coin
+            flip. Every one of them is here now, by the day, and YOU choose. */}
+        <div className="section">
+          <div className="section-head section-head--gold">
+            What’s on
+          </div>
+          {[...new Set(game.games.map(g => g.iso))].map(iso => (
+            <div className="on-day" key={iso}>
+              <div className="on-date">{game.games.find(g => g.iso === iso).date}</div>
+              {game.games.filter(g => g.iso === iso).map((g, i) => (
+                <div className="on-row" key={i}>
+                  <span className="on-league">{g.league}</span>
+                  <span className="on-body">
+                    <span className="on-fixture">{g.fixture}</span>
+                    <span className="on-venue">{g.venue}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
 
         <div className="section">
           <div className="section-head section-head--scarlet">The town</div>

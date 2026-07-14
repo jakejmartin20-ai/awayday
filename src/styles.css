@@ -457,6 +457,70 @@ button {
 
 .section-head--scarlet { border-left: 10px solid var(--scarlet); }
 .section-head--navy { border-left: 10px solid var(--navy); }
+.section-head--gold { border-left: 10px solid var(--gold); }
+
+/* ---------------------------------------------------------------------------
+   WHAT'S ON (S20). Every game on in the town while you're there, by the day.
+   The league badge answers "what sport is this" — which the fixture never did.
+   --------------------------------------------------------------------------- */
+.on-day { margin-bottom: 14px; }
+.on-day:last-child { margin-bottom: 0; }
+
+.on-date {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--cream);
+  background: var(--charcoal);
+  transform: skewX(-10deg);
+  display: inline-block;
+  padding: 2px 9px;
+  margin-bottom: 6px;
+}
+
+.on-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 7px 0;
+  border-top: 1px solid var(--border);
+}
+
+.on-league {
+  flex: 0 0 auto;
+  min-width: 52px;
+  text-align: center;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--cream);
+  background: var(--scarlet);
+  transform: skewX(-10deg);
+  padding: 3px 6px;
+  margin-top: 1px;
+}
+
+.on-body { display: flex; flex-direction: column; min-width: 0; }
+
+.on-fixture {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  color: var(--charcoal);
+  text-transform: uppercase;
+}
+
+.on-venue {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
 
 .fact {
   margin: 0 0 10px;
