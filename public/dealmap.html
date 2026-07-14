@@ -577,6 +577,13 @@ function spin() {
   requestAnimationFrame(step_);
 }
 
+function reSpin() {
+  const crown = document.getElementById('crown');
+  if (crown) crown.innerHTML = '';
+  landing.innerHTML = '';
+  spin();
+}
+
 function land(i) {
   const step = 360 / N;
   kicker.textContent = 'Fate picked';
@@ -595,7 +602,7 @@ function land(i) {
   document.getElementById('see').onclick = () => alert('The real result screen. Already built (S5/S8).');
   document.getElementById('again').onclick = deal;
   const sa = document.getElementById('spinagain');
-  if (sa) sa.onclick = () => { document.getElementById('crown').innerHTML = ''; landing.innerHTML = ''; spin(); };
+  if (sa) sa.onclick = reSpin;
 }
 
 // -------------------------------------------------------------------------
@@ -624,12 +631,15 @@ function updateClock() {
       : `<b>${(pre/1000).toFixed(1)}s of map</b>, then you tap, then ${(SPIN_MS/1000).toFixed(1)}s of wheel.`;
 }
 
+// Changing the speed must NOT redeal — otherwise comparing four spins means
+// sitting through four maps. Set the number, leave the wheel where it is, and
+// let "Spin again" fire it. Back-to-back spins, same nine towns.
 document.querySelectorAll('#speeds .chip').forEach(c => {
   c.onclick = () => {
     document.querySelectorAll('#speeds .chip').forEach(x => x.classList.remove('on'));
     c.classList.add('on');
     SPIN_MS = +c.dataset.ms;
-    deal();
+    updateClock();
   };
 });
 
