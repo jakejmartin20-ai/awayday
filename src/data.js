@@ -14098,17 +14098,29 @@ export const SLICES = 9
 // ---------------------------------------------------------------------------
 // MODE 2 — OPEN ROAD
 // ---------------------------------------------------------------------------
-// You do not choose a team. You choose a WEEKEND. Fate does the rest.
+// You do not choose a team. You choose a WINDOW. Fate does the rest.
 //
-// THE MINIMUM VIABLE MODE 2 IS A DATE PICKER AND NOTHING ELSE (S17). The median
-// weekend has a game on in fifty-eight towns and the thinnest has thirteen — so
-// the deal fires every weekend of the year, and every other knob (city size,
-// region, sport) is a NARROWING FEATURE, which is post-launch.
+// 🔴 S20 KILLED "A WEEKEND IS ITS SATURDAY".
+// That rule was written for the machine's convenience, not for a traveller. If
+// you are on the ground THURSDAY TO MONDAY, a Thursday night in Toledo IS the
+// trip. The old model threw those games away — and with them most of MiLB, MLB
+// and the USLs, all of which play six nights a week.
+//
+//   MODE 2 IS A TRAVELLER FRAMING A TRIP. The input is a DATE RANGE.
+//
+// THE MINIMUM VIABLE MODE 2 IS STILL A DATE PICKER AND NOTHING ELSE (S17). No
+// city-size filter, no region, no sport toggles. Every other knob is a
+// NARROWING feature, and narrowing is the opposite of the promise.
+//
+// AND NO COUNTS ON THE SCREEN. The old picker listed fourteen weekends with the
+// number of towns beside each, which invited you to SHOP — and telling you the
+// odds before the spin is the opposite of a roulette wheel (S4). The count now
+// does exactly one job: it GATES the button. It never ranks your calendar.
 //
 // THE POOL IS US + CANADA (S18, Jake's call). Nine cards carry `intl: true` and
 // Mode 2 filters them out. MODE 1 KEEPS THEM: if you CHOSE the Jaguars, London
-// is the prize. If all you said was "I'm free that weekend", fate does not get
-// to book you Melbourne.
+// is the prize. If all you said was "I'm free that week", fate does not get to
+// book you Melbourne.
 //
 // ⚠️ It is a KEY ON THE CARD, never a coordinate box. `lat >= 24` cleanly
 // separates Mexico City from Miami and silently calls HONOLULU international.
@@ -14119,64 +14131,57 @@ const inPool = (cityId) => {
   return !!c && c.intl !== true
 }
 
-// A weekend is its SATURDAY. Games on the Saturday and the Sunday are in it;
-// a Tuesday night in Toledo is not a weekend away.
-function saturdayOf(iso) {
+const addDay = (iso, n = 1) => {
   const [y, m, d] = iso.split('-').map(Number)
-  const dt = new Date(y, m - 1, d)
-  const day = dt.getDay()
-  if (day !== 6 && day !== 0) return null          // not a weekend
-  if (day === 0) dt.setDate(dt.getDate() - 1)      // Sunday belongs to its Saturday
-  return dt.toISOString().slice(0, 10)
+  const dt = new Date(y, m - 1, d + n)
+  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`
 }
 
-const addDay = (iso) => {
-  const [y, m, d] = iso.split('-').map(Number)
-  const dt = new Date(y, m - 1, d + 1)
-  return dt.toISOString().slice(0, 10)
-}
-
-// "SAT 18 — SUN 19 JULY"
-export function weekendLabel(sat) {
-  const sun = addDay(sat)
-  const [, m1, d1] = sat.split('-').map(Number)
-  const [, m2, d2] = sun.split('-').map(Number)
-  return m1 === m2
-    ? `Sat ${d1} \u2013 Sun ${d2} ${MONTHS[m1 - 1]}`
-    : `Sat ${d1} ${MONTHS[m1 - 1]} \u2013 Sun ${d2} ${MONTHS[m2 - 1]}`
-}
-
-// Every weekend from here on that has a game on somewhere in the pool, with the
-// number of TOWNS in play — the unit is the town, not the fixture (S7).
-export function weekends(limit = 14) {
+// The calendar cannot open on a month with nothing in it, and cannot scroll past
+// the last game we hold. Both ends come off the DATA, never off a constant.
+export function dateBounds() {
   const now = today()
-  const byWeekend = new Map()
+  let max = now
+  GAMES.forEach(g => { if (g.date > max && inPool(g.cityId)) max = g.date })
+  return { min: now, max }
+}
+
+// "THU 16 – MON 20 JULY". One day reads "SAT 18 JULY".
+export function rangeLabel(from, to) {
+  const [, m1, d1] = from.split('-').map(Number)
+  const [, m2, d2] = to.split('-').map(Number)
+  const day = (iso) => {
+    const [y, m, d] = iso.split('-').map(Number)
+    return DAYS[new Date(y, m - 1, d).getDay()]
+  }
+  if (from === to) return `${day(from)} ${d1} ${MONTHS[m1 - 1]}`
+  return m1 === m2
+    ? `${day(from)} ${d1} \u2013 ${day(to)} ${d2} ${MONTHS[m1 - 1]}`
+    : `${day(from)} ${d1} ${MONTHS[m1 - 1]} \u2013 ${day(to)} ${d2} ${MONTHS[m2 - 1]}`
+}
+
+// The number of TOWNS in play across a window — the unit is the town, not the
+// fixture (S7). This exists ONLY to gate the button. It is never rendered.
+export function townsInRange(from, to) {
+  const t = new Set()
   GAMES.forEach(g => {
-    if (g.date < now || !inPool(g.cityId)) return
-    const sat = saturdayOf(g.date)
-    if (!sat) return
-    if (!byWeekend.has(sat)) byWeekend.set(sat, new Set())
-    byWeekend.get(sat).add(g.cityId)
+    if (g.date >= from && g.date <= to && inPool(g.cityId)) t.add(g.cityId)
   })
-  return [...byWeekend.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .slice(0, limit)
-    .map(([sat, towns]) => ({ sat, label: weekendLabel(sat), towns: towns.size }))
+  return t.size
 }
 
 // The same game-object contract as awaySlate. The wheel, the deal-map and the
 // result screen cannot tell the two modes apart, and that is the point.
-export function weekendSlate(sat) {
-  const sun = addDay(sat)
+export function rangeSlate(from, to) {
   return GAMES
-    .filter(g => (g.date === sat || g.date === sun) && inPool(g.cityId))
+    .filter(g => g.date >= from && g.date <= to && inPool(g.cityId))
     .sort((a, b) => a.date.localeCompare(b.date))
     .map(g => {
       const home = teamById(g.home)
       const away = teamById(g.away)
       const card = CITIES[g.cityId]
       return {
-        id: `${sat}-${g.date}-${g.cityId}-${g.home}-${g.away}`,
+        id: `${from}-${to}-${g.date}-${g.cityId}-${g.home}-${g.away}`,
         opponent: home ? home.name : g.home,
         fixture: `${(away ? away.name : g.away).toUpperCase()} AT ${(home ? home.name : g.home).toUpperCase()}`,
         venue: venueLine(g.venue, g.cityId),

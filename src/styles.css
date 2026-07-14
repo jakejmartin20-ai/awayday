@@ -490,43 +490,97 @@ button {
 /* --- MODE 2: THE DATE PICKER --------------------------------------------- */
 /* One row per weekend, with the number of TOWNS in play — never fixtures.
    The unit is the town (S7). */
-.week-row {
+/* ---------------------------------------------------------------------------
+   THE CALENDAR (S20). Replaces .week-row — you pick a WINDOW, not a weekend.
+   Square cells, flat fills, no rounded pills, no gradients. Endpoints scarlet,
+   the nights between them gold.
+   --------------------------------------------------------------------------- */
+.cal {
+  max-height: 46vh;
+  overflow-y: auto;
+  border: 2px solid var(--charcoal);
+  background: var(--cream);
+  padding: 10px;
+  margin-bottom: 18px;
+}
+
+.cal-month { margin-bottom: 18px; }
+.cal-month:last-child { margin-bottom: 0; }
+
+.cal-name {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: var(--cream);
+  background: var(--charcoal);
+  transform: skewX(-10deg);
+  padding: 4px 10px;
+  margin: 0 0 8px 4px;
+  display: inline-block;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-head {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  text-align: center;
+  color: var(--muted);
+  padding-bottom: 2px;
+}
+
+.cal-blank { aspect-ratio: 1 / 1; }
+
+.cal-day {
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  background: var(--cream);
-  border: 2px solid var(--border);
-  border-left: 10px solid var(--border);
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--charcoal);
+  background: transparent;
+  border: 1px solid var(--border);
   border-radius: 0;
-  padding: 13px 12px;
-  margin-bottom: 8px;
-  text-align: left;
+  cursor: pointer;
+  padding: 0;
 }
 
-.week-row--on {
-  border-color: var(--charcoal);
-  border-left-color: var(--scarlet);
-  background: #E6DCC6;
+.cal-day--off {
+  color: var(--border);
+  border-color: transparent;
+  cursor: default;
 }
 
-.week-when {
-  text-transform: uppercase;
+.cal-day--in {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--charcoal);
+}
+
+.cal-day--on {
+  background: var(--scarlet);
+  border-color: var(--scarlet);
+  color: var(--cream);
   font-weight: 700;
-  font-size: 18px;
-  letter-spacing: 0.06em;
-  transform: var(--skew);
 }
 
-.week-towns {
-  text-transform: uppercase;
+.cal-chosen {
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  color: var(--muted);
+  font-size: 17px;
+  letter-spacing: 0.05em;
+  color: var(--charcoal);
+  transform: skewX(-10deg);
+  margin-bottom: 10px;
 }
-
-.week-row--on .week-towns { color: var(--scarlet); }
 
 /* --- MODE 2: THE DEAL-MAP ------------------------------------------------ */
 /* THE STAGE IS THE WHEEL'S BOX. Same width, same aspect ratio, same place on
