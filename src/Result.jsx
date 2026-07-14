@@ -61,7 +61,7 @@ export default function Result({ game, title, onSpinAgain, onBack }) {
             game — in a Thursday-to-Monday window, sixty-eight towns out of
             eighty-one have three or more. They were being thrown away by a coin
             flip. Every one of them is here now, by the day, and YOU choose. */}
-        <div className="section">
+        <div className="section section--top">
           <div className="section-head section-head--gold">
             What’s on
           </div>

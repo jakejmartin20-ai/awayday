@@ -14066,6 +14066,7 @@ export function awaySlate(teamId) {
         city: card.city,
         state: card.state,
         stateCode: stateCode(card.state),
+        sliceCode: shortCode(card.state),
         lat: card.lat,
         lng: card.lng,
         facts: card.facts,
@@ -14156,6 +14157,15 @@ const STATE_CODES = {
 // A state we do not know comes back UNCHANGED. It never comes back wrong, and it
 // never comes back blank. (London reads "United Kingdom", which is correct.)
 export const stateCode = (s) => STATE_CODES[s] || s
+
+// The wheel slice is 9px of condensed type with 104px of radial room (hub 34,
+// label starts at 138). "ON, CAN" does not fit on it. "ON" does — and the
+// LANDING, which has a whole line to itself, says the rest.
+//   MEASURE THE BOX BEFORE YOU PUT SOMETHING IN IT.
+export const shortCode = (s) => {
+  const c = STATE_CODES[s]
+  return c ? c.split(',')[0].trim() : ''
+}
 
 // A TOWN, not a game. Folds every game on in that town, inside your window, into
 // the ONE object the wheel and the result screen already know how to read.
@@ -14267,6 +14277,7 @@ export function rangeSlate(from, to) {
         city: card.city,
         state: card.state,
         stateCode: stateCode(card.state),
+        sliceCode: shortCode(card.state),
         lat: card.lat,
         lng: card.lng,
         facts: card.facts,

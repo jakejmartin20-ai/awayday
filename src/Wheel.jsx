@@ -130,7 +130,7 @@ export default function Wheel({ games, title, dealt, auto, onResult, onSpinAgain
       const idx = underNeedle(r)
       if (idx !== passing.current) {
         passing.current = idx
-        setTicker(games[idx].city)
+        setTicker(`${games[idx].city}${games[idx].sliceCode ? ' \u00b7 ' + games[idx].sliceCode : ''}`)
         setFlick(Math.min(14, speed * 0.5))
       } else {
         setFlick(f => f * 0.82)
@@ -187,8 +187,12 @@ export default function Wheel({ games, title, dealt, auto, onResult, onSpinAgain
                       textAnchor={flip ? 'start' : 'end'}
                       dominantBaseline="middle"
                       transform={`rotate(${flip ? angle + 180 : angle} ${lx} ${ly})`}
+                      style={{ fontSize: (g.city.length + g.sliceCode.length) > 15 ? 8 : 9 }}
                     >
                       {g.city.toUpperCase()}
+                      {g.sliceCode && (
+                        <tspan className="slice-state" dx="3">{g.sliceCode}</tspan>
+                      )}
                     </text>
                   </g>
                 )
@@ -231,9 +235,19 @@ export default function Wheel({ games, title, dealt, auto, onResult, onSpinAgain
         {win ? (
           <div className="landing">
             <div className="landing-city">{win.city}</div>
+            <div className="landing-state">{win.stateCode}</div>
+            {/* 🔴 S20. The wheel deals a TOWN, and a town is rarely one game.
+                Naming a single fixture here was the last place the app still
+                pretended otherwise. */}
             <div className="lower-third">
-              <span className="lt-left">{win.fixture}</span>
-              <span className="lt-right">{win.date}</span>
+              <span className="lt-left">
+                {win.games.length === 1 ? win.fixture : `${win.games.length} games on`}
+              </span>
+              <span className="lt-right">
+                {win.games.length === 1
+                  ? win.date
+                  : `${win.games[0].date} \u2013 ${win.games[win.games.length - 1].date}`}
+              </span>
             </div>
             <Loud onClick={() => onResult(win)}>See the trip</Loud>
             <Quiet onClick={() => { setWinner(null); onSpinAgain && onSpinAgain(); spin() }}>Spin again</Quiet>

@@ -354,6 +354,16 @@ button {
   letter-spacing: 0.08em;
 }
 
+/* The state code rides on the slice at 7px. 104px of radial room, and the
+   longest town we hold is COLORADO SPRINGS — the label steps down to 8px when
+   it needs to. */
+.slice-state {
+  font-size: 7px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  opacity: 0.72;
+}
+
 .ticker {
   text-align: center;
   color: var(--muted);
@@ -365,6 +375,15 @@ button {
 }
 
 .landing { margin-top: 4px; }
+
+.landing-state {
+  text-transform: uppercase;
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  margin: -6px 0 12px;
+}
 
 .landing-city {
   text-transform: uppercase;
@@ -444,6 +463,7 @@ button {
 }
 
 .section { margin-bottom: 22px; }
+.section--top { margin-top: 26px; }
 
 .section-head {
   text-transform: uppercase;
