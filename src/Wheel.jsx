@@ -66,7 +66,16 @@ function wedgePath(from, to) {
 
 const easeOut = (t) => 1 - Math.pow(1 - t, 4) // heavy — it hangs at the end
 
-export default function Wheel({ games, teamName, dealt, onResult, onSpinAgain, onDealAgain, onBack }) {
+// AUTO (S18, Mode 2). The deal-map already gave you the beat, and the pins have
+// just become this rim. Landing on a static wheel and being asked to press a
+// button you were always going to press is dead air — A BUTTON YOU WERE ALWAYS
+// GOING TO PRESS IS A FAKE DECISION. The commitment lives on the DATE screen
+// now, and fate runs unbroken from there to the result.
+//
+// Mode 1 does not pass `auto`. You tap. Nothing shipped changes.
+const AUTO_MS = 260
+
+export default function Wheel({ games, title, dealt, auto, onResult, onSpinAgain, onDealAgain, onBack }) {
   const n = games.length
   const step = 360 / n
   const colours = sliceColours(n)
@@ -82,6 +91,14 @@ export default function Wheel({ games, teamName, dealt, onResult, onSpinAgain, o
   const passing = useRef(-1)
 
   useEffect(() => () => cancelAnimationFrame(raf.current), [])
+
+  // Auto-spin: a beat for the rim to settle into a wheel, then fate goes.
+  useEffect(() => {
+    if (!auto) return
+    const t = setTimeout(() => spin(), AUTO_MS)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auto])
 
   // Which slice is sitting under the needle right now?
   const underNeedle = (r) => {
@@ -139,7 +156,7 @@ export default function Wheel({ games, teamName, dealt, onResult, onSpinAgain, o
   return (
     <>
       <Header onBack={spinning ? undefined : onBack} />
-      <Strip left={teamName} right={`${n} TOWNS ON THE WHEEL`} />
+      <Strip left={title} right={`${n} TOWNS ON THE WHEEL`} />
 
       <div className="pad">
         <Kicker>{win ? 'Fate picked' : spinning ? 'Fate is deciding' : 'Spin it'}</Kicker>
@@ -215,13 +232,16 @@ export default function Wheel({ games, teamName, dealt, onResult, onSpinAgain, o
           <div className="landing">
             <div className="landing-city">{win.city}</div>
             <div className="lower-third">
-              <span className="lt-left">AT {win.opponent.toUpperCase()}</span>
+              <span className="lt-left">{win.fixture}</span>
               <span className="lt-right">{win.date}</span>
             </div>
             <Loud onClick={() => onResult(win)}>See the trip</Loud>
             <Quiet onClick={() => { setWinner(null); onSpinAgain && onSpinAgain(); spin() }}>Spin again</Quiet>
             {dealt && <Quiet onClick={onDealAgain}>Deal again</Quiet>}
           </div>
+        ) : auto ? (
+          // No button. The previous screen had it.
+          <div className="landing" />
         ) : (
           <div className="landing">
             <Loud onClick={spin} disabled={spinning}>{spinning ? 'Spinning' : 'Spin'}</Loud>

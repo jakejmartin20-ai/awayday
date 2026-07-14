@@ -1,15 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
-import { Header, Strip, Kicker, Loud, Quiet } from './Frame'
-import { LEAGUES, TEAMS, SLICES, teamsInLeague, teamById, awaySlate, townsFromSlate } from './data'
+import { Header, Strip, Kicker, Loud } from './Frame'
+import {
+  LEAGUES, SLICES, teamsInLeague, teamById, awaySlate, townsFromSlate,
+  weekends, weekendSlate, weekendLabel
+} from './data'
 import Wheel from './Wheel'
+import DealMap from './DealMap'
 import Result from './Result'
 
 // ---------------------------------------------------------------------------
 // AWAY DAY
-// Narrow the pool -> fate deals nine -> fate picks one -> the result screen.
+// Narrow the pool -> fate deals nine towns -> fate picks one -> the result.
 //
-// One state machine, no router. Screens:
-//   mode -> league -> team -> slate -> wheel -> result
+// One state machine, no router. TWO WAYS IN, one ending:
+//
+//   MODE 1  mode -> league -> team -> slate  -> wheel (you tap) -> result
+//   MODE 2  mode ->                   dates  -> deal-map -> wheel (auto) -> result
+//
+// The wheel and the result screen cannot tell the two modes apart. They are
+// handed the same game object either way, and that is the whole architecture.
 // ---------------------------------------------------------------------------
 
 const SHUFFLE_MS = 1300   // fast and mechanical. If it lingers, it steals from the spin.
@@ -25,10 +34,16 @@ const shuffled = (arr) => {
   return a
 }
 
+const oneOf = (arr) => arr[Math.floor(Math.random() * arr.length)]
+
+// THE DEAL, in one line. Nine TOWNS, never nine fixtures — a town with two games
+// on is one candidate, and fate takes one of its dates on the way out (S7).
+const dealNine = (games) => shuffled(townsFromSlate(games)).slice(0, SLICES).map(oneOf)
+
 // ---------------------------------------------------------------------------
 // 1. MODE PICKER
 // ---------------------------------------------------------------------------
-function ModePicker({ onPick }) {
+function ModePicker({ onTeam, onOpenRoad }) {
   return (
     <>
       <Header />
@@ -36,16 +51,13 @@ function ModePicker({ onPick }) {
       <div className="pad">
         <Kicker>Two ways in</Kicker>
 
-        <button className="card card--loud" onClick={onPick}>
+        <button className="card card--loud" onClick={onTeam}>
           <span className="card-title">Team Away Day</span>
           <span className="card-sub">Follow your team. Fate picks the away game.</span>
         </button>
 
-        <button className="card card--quiet" disabled>
-          <span className="card-title">
-            Open Road
-            <span className="chip">Soon</span>
-          </span>
+        <button className="card card--loud" onClick={onOpenRoad}>
+          <span className="card-title">Open Road</span>
           <span className="card-sub">Put in your free dates. Land somewhere you’d never have picked.</span>
         </button>
       </div>
@@ -54,9 +66,13 @@ function ModePicker({ onPick }) {
 }
 
 // ---------------------------------------------------------------------------
-// 2. LEAGUE PICKER
+// 2. LEAGUE PICKER — MODE 1 ONLY.
+// MiLB, MLS and the USLs are MODE 2 ONLY. They carry `mode2Only: true` and are
+// filtered out here. NFL and NHL carry no such key, so nothing shipped changes
+// and the NHL bake needs no edit at all.
 // ---------------------------------------------------------------------------
 function LeaguePicker({ onPick, onBack }) {
+  const leagues = LEAGUES.filter(l => l.mode2Only !== true)
   return (
     <>
       <Header onBack={onBack} />
@@ -64,12 +80,8 @@ function LeaguePicker({ onPick, onBack }) {
       <div className="pad">
         <Kicker>Pick a league</Kicker>
 
-        {LEAGUES.map(l => (
-          <button
-            key={l.id}
-            className={`league league--${l.id}`}
-            onClick={() => onPick(l.id)}
-          >
+        {leagues.map(l => (
+          <button key={l.id} className={`league league--${l.id}`} onClick={() => onPick(l.id)}>
             <span className="league-name">{l.name}</span>
             <span className="league-note">{l.note}</span>
           </button>
@@ -95,11 +107,7 @@ function TeamPicker({ leagueId, onPick, onBack }) {
         <Kicker>Pick your team</Kicker>
         <div className="team-list">
           {teams.map(t => (
-            <button
-              key={t.id}
-              className={`team-row team-row--${leagueId}`}
-              onClick={() => onPick(t.id)}
-            >
+            <button key={t.id} className={`team-row team-row--${leagueId}`} onClick={() => onPick(t.id)}>
               <span className="team-name">{t.name}</span>
               <span className="chev">&#8250;</span>
             </button>
@@ -111,19 +119,8 @@ function TeamPicker({ leagueId, onPick, onBack }) {
 }
 
 // ---------------------------------------------------------------------------
-// 4. AWAY SLATE — and THE DEAL
-//
-// THE DEAL DEALS TOWNS, NOT FIXTURES. A slate can visit the same city twice —
-// the Chiefs are in Los Angeles twice, the Jaguars are in London twice. Each
-// city is one candidate on the wheel, never two slices with the same name.
-// If fate deals a town that holds two dates, it takes one of them on the way out.
-//
-// 9 towns or fewer: no deal. The button reads SPIN, every town is a slice.
-// More than 9 towns: the pile shuffles, nine rows go scarlet one at a time and
-// fly out, and those nine towns become the wheel.
+// 4. AWAY SLATE — and THE DEAL  (Mode 1)
 // ---------------------------------------------------------------------------
-const oneOf = (arr) => arr[Math.floor(Math.random() * arr.length)]
-
 function Slate({ team, games, autoDeal, onDealt, onBack }) {
   const towns = townsFromSlate(games)
   const needsDeal = towns.length > SLICES
@@ -131,7 +128,7 @@ function Slate({ team, games, autoDeal, onDealt, onBack }) {
   const [order, setOrder] = useState(games)
   const [phase, setPhase] = useState('idle')   // idle | shuffle | picking
   const [flash, setFlash] = useState(-1)
-  const [picked, setPicked] = useState([])     // ids, in the order fate took them
+  const [picked, setPicked] = useState([])
 
   const timers = useRef([])
   const started = useRef(false)
@@ -141,13 +138,10 @@ function Slate({ team, games, autoDeal, onDealt, onBack }) {
 
   const deal = () => {
     if (phase !== 'idle') return
-
-    // Nothing to deal — every town on the slate already fits on the wheel.
     if (!needsDeal) { onDealt(towns.map(t => t[0]), false); return }
 
     setPhase('shuffle')
 
-    // The shuffle: fast, mechanical, rows flashing gold.
     const shuffleTick = () => {
       setOrder(o => shuffled(o))
       setFlash(Math.floor(Math.random() * Math.min(8, games.length)))
@@ -158,31 +152,22 @@ function Slate({ team, games, autoDeal, onDealt, onBack }) {
       t += 90
     }
 
-    // Then fate takes nine.
     timers.current.push(setTimeout(() => {
       setFlash(-1)
       setPhase('picking')
-      // Nine distinct towns. One date each, chosen by fate.
-      const nine = shuffled(towns).slice(0, SLICES).map(oneOf)
+      const nine = dealNine(games)
 
       nine.forEach((g, i) => {
         timers.current.push(setTimeout(() => {
-          // Pull the chosen game to the top of the pile, then it goes scarlet
-          // and flies out. Always at the top, so it always happens where you
-          // are looking.
           setOrder(o => [g, ...o.filter(x => x.id !== g.id)])
           setPicked(p => [...p, g.id])
         }, i * PICK_MS))
       })
 
-      timers.current.push(setTimeout(
-        () => onDealt(nine, true),
-        SLICES * PICK_MS + HANDOFF_MS
-      ))
+      timers.current.push(setTimeout(() => onDealt(nine, true), SLICES * PICK_MS + HANDOFF_MS))
     }, SHUFFLE_MS))
   }
 
-  // DEAL AGAIN comes straight back here and throws immediately.
   useEffect(() => {
     if (autoDeal && !started.current) {
       started.current = true
@@ -192,10 +177,7 @@ function Slate({ team, games, autoDeal, onDealt, onBack }) {
   }, [autoDeal])
 
   const busy = phase !== 'idle'
-  const stripRight = phase === 'picking'
-    ? `${SLICES} TOWNS ON THE WHEEL`
-    : `${games.length} GAMES`
-
+  const stripRight = phase === 'picking' ? `${SLICES} TOWNS ON THE WHEEL` : `${games.length} GAMES`
   const line = needsDeal
     ? `Fate deals nine of these ${towns.length} towns onto the wheel.`
     : 'Every one of these is a slice on the wheel.'
@@ -237,21 +219,70 @@ function Slate({ team, games, autoDeal, onDealt, onBack }) {
 }
 
 // ---------------------------------------------------------------------------
+// 5. THE DATE PICKER  (Mode 2)
+//
+// THE MINIMUM VIABLE MODE 2 IS A DATE PICKER AND NOTHING ELSE (S17). The median
+// weekend has a game on in fifty-eight towns and the thinnest has thirteen, so
+// the deal fires every weekend of the year. No city-size filter, no region, no
+// sport toggles — every other knob is a NARROWING feature, and narrowing is the
+// opposite of the promise.
+//
+// AND THIS SCREEN CARRIES THE COMMITMENT. One loud button — you're free that
+// weekend, GO — and from here fate runs unbroken through the map, the rim and
+// the wheel without asking you anything again.
+// ---------------------------------------------------------------------------
+function DatePicker({ onGo, onBack }) {
+  const list = weekends()
+  const [sat, setSat] = useState(list.length ? list[0].sat : null)
+  const chosen = list.find(w => w.sat === sat)
+
+  return (
+    <>
+      <Header onBack={onBack} />
+      <Strip left="Open Road" right="Pick a weekend" />
+
+      <div className="pad">
+        <Kicker>When are you free?</Kicker>
+        <p className="note note--tight">Fate picks the town. Wherever it lands — that’s the trip.</p>
+
+        <div className="team-list">
+          {list.map(w => (
+            <button
+              key={w.sat}
+              className={`week-row ${w.sat === sat ? 'week-row--on' : ''}`}
+              onClick={() => setSat(w.sat)}
+            >
+              <span className="week-when">{w.label}</span>
+              <span className="week-towns">{w.towns} towns</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="landing">
+          <Loud onClick={() => onGo(sat)} disabled={!chosen}>I’m free — deal it</Loud>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // THE STATE MACHINE
 // ---------------------------------------------------------------------------
 export default function App() {
   const [screen, setScreen] = useState('mode')
+  const [mode, setMode] = useState(null)          // 'team' | 'road'
   const [leagueId, setLeagueId] = useState(null)
   const [teamId, setTeamId] = useState(null)
+  const [sat, setSat] = useState(null)            // the weekend, Mode 2
   const [slate, setSlate] = useState([])
   const [wheelGames, setWheelGames] = useState([])
-  const [dealt, setDealt] = useState(false)     // did a deal actually happen?
+  const [dealt, setDealt] = useState(false)
   const [autoDeal, setAutoDeal] = useState(false)
   const [dealNonce, setDealNonce] = useState(0)
   const [game, setGame] = useState(null)
 
-  // Every screen opens at the top. One page swapping screens in and out means
-  // the browser keeps your scroll position unless we tell it not to.
+  // Every screen opens at the top (S9).
   useEffect(() => {
     window.scrollTo(0, 0)
     document.documentElement.scrollTop = 0
@@ -259,6 +290,12 @@ export default function App() {
   }, [screen])
 
   const team = teamId ? teamById(teamId) : null
+  const road = mode === 'road'
+
+  // The strip's left-hand word, and the result screen's. In Mode 1 it is who you
+  // follow; in Mode 2 there is no team — it is the weekend you gave away.
+  const title = road ? (sat ? weekendLabel(sat) : 'Open Road') : (team ? team.name : '')
+  const poolTowns = road ? townsFromSlate(slate).length : 0
 
   const pickTeam = (id) => {
     setTeamId(id)
@@ -273,8 +310,20 @@ export default function App() {
     setScreen('wheel')
   }
 
-  // Fresh nine from the full slate.
+  // MODE 2's deal. No shuffling pile to watch — the MAP is the deal.
+  const dealWeekend = (s) => {
+    const games = weekendSlate(s)
+    setSat(s)
+    setSlate(games)
+    setWheelGames(dealNine(games))
+    setDealt(true)
+    setDealNonce(n => n + 1)
+    setScreen('dealmap')
+  }
+
+  // DEAL AGAIN. Mode 1 goes back to the pile; Mode 2 goes back to the map.
   const dealAgain = () => {
+    if (road) { dealWeekend(sat); return }
     setAutoDeal(true)
     setDealNonce(n => n + 1)
     setScreen('slate')
@@ -283,7 +332,10 @@ export default function App() {
   return (
     <div className="app">
       {screen === 'mode' && (
-        <ModePicker onPick={() => setScreen('league')} />
+        <ModePicker
+          onTeam={() => { setMode('team'); setScreen('league') }}
+          onOpenRoad={() => { setMode('road'); setScreen('dates') }}
+        />
       )}
 
       {screen === 'league' && (
@@ -294,11 +346,11 @@ export default function App() {
       )}
 
       {screen === 'team' && (
-        <TeamPicker
-          leagueId={leagueId}
-          onPick={pickTeam}
-          onBack={() => setScreen('league')}
-        />
+        <TeamPicker leagueId={leagueId} onPick={pickTeam} onBack={() => setScreen('league')} />
+      )}
+
+      {screen === 'dates' && (
+        <DatePicker onGo={dealWeekend} onBack={() => setScreen('mode')} />
       )}
 
       {screen === 'slate' && team && (
@@ -312,22 +364,38 @@ export default function App() {
         />
       )}
 
+      {screen === 'dealmap' && (
+        <DealMap
+          key={`${sat}-${dealNonce}`}
+          games={wheelGames}
+          title={title}
+          poolTowns={poolTowns}
+          onRim={() => setScreen('wheel')}
+          onBack={() => setScreen('dates')}
+        />
+      )}
+
       {screen === 'wheel' && (
         <Wheel
           key={wheelGames.map(g => g.id).join('|')}
           games={wheelGames}
-          teamName={team.name}
+          title={title}
           dealt={dealt}
+          auto={road}
           onResult={(g) => { setGame(g); setScreen('result') }}
           onDealAgain={dealAgain}
-          onBack={() => { setAutoDeal(false); setScreen('slate') }}
+          onBack={() => {
+            if (road) { setScreen('dates'); return }
+            setAutoDeal(false)
+            setScreen('slate')
+          }}
         />
       )}
 
       {screen === 'result' && game && (
         <Result
           game={game}
-          teamName={team.name}
+          title={title}
           onSpinAgain={() => setScreen('wheel')}
           onBack={() => setScreen('wheel')}
         />

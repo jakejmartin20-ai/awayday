@@ -486,3 +486,109 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .slate-row--picked { animation-duration: 1ms; }
 }
+
+/* --- MODE 2: THE DATE PICKER --------------------------------------------- */
+/* One row per weekend, with the number of TOWNS in play — never fixtures.
+   The unit is the town (S7). */
+.week-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--cream);
+  border: 2px solid var(--border);
+  border-left: 10px solid var(--border);
+  border-radius: 0;
+  padding: 13px 12px;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.week-row--on {
+  border-color: var(--charcoal);
+  border-left-color: var(--scarlet);
+  background: #E6DCC6;
+}
+
+.week-when {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  transform: var(--skew);
+}
+
+.week-towns {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.week-row--on .week-towns { color: var(--scarlet); }
+
+/* --- MODE 2: THE DEAL-MAP ------------------------------------------------ */
+/* THE STAGE IS THE WHEEL'S BOX. Same width, same aspect ratio, same place on
+   the screen — so a pin can fly off a real town and land exactly on the rim
+   the wheel is about to draw. Change .wheel and you must change this. */
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 330 / 345;
+  margin: 4px auto 0;
+  overflow: hidden;
+}
+
+.dealmap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #DFE3D8;
+  border: 2px solid var(--charcoal);
+  opacity: 0;
+  transition: opacity .6s ease .25s;
+}
+
+.dealmap.on { opacity: 1; transition: opacity .45s ease; }
+
+.tiles { position: absolute; top: 0; left: 0; }
+.tiles img { position: absolute; width: 256px; height: 256px; display: block; }
+
+/* OSM's attribution is a condition of the tiles being free. It stays. */
+.attrib {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  background: rgba(239, 231, 214, .82);
+  color: #333;
+  font-family: system-ui, sans-serif;
+  font-size: 9px;
+  padding: 1px 4px;
+}
+
+.attrib a { color: #333; }
+
+/* NINE PINS, NO NAMES. An anonymous near-miss is just movement — so the names
+   are withheld until the pins have become the wheel (S4, S6). */
+.pin {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -16px 0 0 -8px;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pin i {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--scarlet);
+  border: 1.5px solid var(--charcoal);
+  transform: rotate(-45deg);
+}

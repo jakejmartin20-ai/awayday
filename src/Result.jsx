@@ -15,9 +15,12 @@ function osmUrl(lat, lng) {
   return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`
 }
 
-export default function Result({ game, teamName, onSpinAgain, onBack }) {
+export default function Result({ game, title, onSpinAgain, onBack }) {
   const share = async () => {
-    const text = `AWAY DAY — fate picked ${game.city.toUpperCase()}. ${teamName} at ${game.opponent}, ${game.date}. ${game.venue}. Wherever it lands, that's the trip.`
+    // The fixture line reads for both modes: "AT THE BEARS" in Mode 1, "IOWA
+    // CUBS AT TOLEDO MUD HENS" in Mode 2. The result screen cannot tell them
+    // apart, and that is the point.
+    const text = `AWAY DAY — fate picked ${game.city.toUpperCase()}. ${game.fixture}, ${game.date}. ${game.venue}. Wherever it lands, that's the trip.`
     try {
       if (navigator.share) await navigator.share({ title: 'Away Day', text })
       else await navigator.clipboard.writeText(text)
@@ -27,7 +30,7 @@ export default function Result({ game, teamName, onSpinAgain, onBack }) {
   return (
     <>
       <Header onBack={onBack} />
-      <Strip left={teamName} right="The trip" />
+      <Strip left={title} right="The trip" />
 
       <div className="pad">
         <Kicker>Fate picked</Kicker>
@@ -44,7 +47,7 @@ export default function Result({ game, teamName, onSpinAgain, onBack }) {
         </div>
 
         <div className="lower-third">
-          <span className="lt-left">AT {game.opponent.toUpperCase()}</span>
+          <span className="lt-left">{game.fixture}</span>
           <span className="lt-right">{game.date}</span>
         </div>
         <div className="venue">{game.venue}</div>
