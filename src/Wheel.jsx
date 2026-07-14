@@ -13,7 +13,20 @@ const R = 150            // wheel radius
 const CX = 165           // centre
 const CY = 165
 const HUB = 34           // hub radius
-const SPIN_MS = 5500     // heavy ease-out, ~5.5 seconds
+// S18: 5500 -> 4000. Tuned against the deal-map, where the wheel is no longer
+// something you TAP — the map deals, the pins fly to the rim, and it spins on
+// its own. 5.5s of wheel on top of 3.4s of map is nine seconds of hands-off
+// animation, and the third run is the one that tells the truth.
+//
+// ONE NUMBER FOR BOTH MODES. The app has ONE MOVING PART (S6) — it does not
+// get two timings. So this shortens Mode 1's wheel too, and Mode 1 gets
+// re-tapped because of it.
+//
+// ⚠️ DO NOT CUT IT FURTHER WITHOUT WATCHING THE END. The easing is heavy on
+// purpose (1 - (1-t)^4) so the needle CRAWLS as it settles, ticking past two
+// or three towns barely moving. That crawl IS the near-miss, and the near-miss
+// is the drama (S6). Below 4s it stops fighting to settle and just stops.
+const SPIN_MS = 4000     // heavy ease-out, ~4 seconds
 const PALETTE = ['scarlet', 'charcoal', 'gold', 'navy']
 
 const FILL = {
