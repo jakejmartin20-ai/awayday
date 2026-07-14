@@ -183,6 +183,11 @@
         <button class="chip" data-pool="wide">A coast-to-coast deal</button>
         <button class="chip" data-pool="jax">Mode 1 &mdash; the Jaguars</button>
       </div>
+      <div class="h" style="padding-top:14px">Jake's question &mdash; does it auto-spin?</div>
+      <div class="chips">
+        <button class="chip" id="auto-off">Tap to spin</button>
+        <button class="chip on" id="auto-on">Auto-spin &mdash; one unbroken run</button>
+      </div>
       <div class="note" id="note"></div>
     </div>
   </div>
@@ -489,7 +494,25 @@ function drawWheel() {
     <g id="needle"><path d="M ${CX-11} 6 L ${CX+11} 6 L ${CX} 34 Z" fill="#1C1C1C"/></g>`;
 }
 
+// -------------------------------------------------------------------------
+// AUTO-SPIN (S18, Jake's call to test).
+//
+// If fate deals and fate picks, the "Spin" button is a FAKE DECISION — you
+// were always going to press it, and there is nothing to think about while
+// you decide. The map already gave you the beat.
+//
+// THE COST: it makes the whole run hands-off. ~8.9 seconds of animation with
+// nothing to touch. The commitment does not disappear — IT MOVES TO THE FRONT.
+// One loud button on the date screen, and fate runs unbroken to the result.
+// -------------------------------------------------------------------------
+let AUTO = true;
+
 function showSpin() {
+  if (AUTO) {
+    landing.innerHTML = '';
+    setTimeout(() => { if (!spinning && !document.getElementById('see')) spin(); }, 260);
+    return;
+  }
   landing.innerHTML = `<button class="btn btn--loud" id="spin"><span>Spin</span></button>
     <button class="btn btn--quiet" id="again"><span>Deal again</span></button>`;
   document.getElementById('spin').onclick = spin;
@@ -500,7 +523,8 @@ function spin() {
   if (spinning) return;
   spinning = true;
   kicker.textContent = 'Fate is deciding';
-  document.getElementById('spin').disabled = true;
+  const b = document.getElementById('spin');
+  if (b) b.disabled = true;
 
   const step = 360 / N;
   const pick = (Math.random() * N) | 0;
@@ -548,9 +572,12 @@ function land(i) {
     <div class="landing-city">${t.city}</div>
     <div class="lower-third"><span class="l">${t.state}</span><span class="r">Mockup &mdash; no fixture</span></div>
     <button class="btn btn--loud" id="see"><span>See the trip</span></button>
+    <button class="btn btn--quiet" id="spinagain"><span>Spin again</span></button>
     <button class="btn btn--quiet" id="again"><span>Deal again</span></button>`;
   document.getElementById('see').onclick = () => alert('The real result screen. Already built (S5/S8).');
   document.getElementById('again').onclick = deal;
+  const sa = document.getElementById('spinagain');
+  if (sa) sa.onclick = () => { document.getElementById('crown').innerHTML = ''; landing.innerHTML = ''; spin(); };
 }
 
 // -------------------------------------------------------------------------
@@ -569,6 +596,10 @@ document.querySelectorAll('.chip').forEach(c => {
     deal();
   };
 });
+
+const aOn = document.getElementById('auto-on'), aOff = document.getElementById('auto-off');
+aOn.onclick  = () => { AUTO = true;  aOn.classList.add('on');  aOff.classList.remove('on'); deal(); };
+aOff.onclick = () => { AUTO = false; aOff.classList.add('on'); aOn.classList.remove('on');  deal(); };
 
 window.addEventListener('load', deal);
 </script>
