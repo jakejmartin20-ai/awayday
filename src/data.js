@@ -1489,7 +1489,7 @@ export const CITIES = {
       'Lumber built the town, and West Fourth Street is still lined with what it paid for.'
     ],
     todo: ['Historic Bowman Field', 'Millionaires\u2019 Row on West Fourth Street', 'The Little League museum, across the river']
-  }
+  },
   tucson: {
     city: 'Tucson', state: 'Arizona', lat: 32.2229, lng: -110.9748,
     facts: [
@@ -15269,7 +15269,7 @@ const VENUE_NOTES = {
   'Tropicana Field|tampa':           'St. Petersburg, 17 miles',
   'Levi\'s Stadium|sanjose':         'Santa Clara, 6 miles',
   'Stanford Stadium|sanjose':        'Palo Alto, 17 miles',
-  'SeatGeek Stadium|chicago':        'Bridgeview, 12 miles'
+  'SeatGeek Stadium|chicago':        'Bridgeview, 12 miles',
   // --- AHL (S21) ------------------------------------------------------
   'Acrisure Arena|palmsprings': 'Palm Desert, 12 miles',
   'Blue Federal Credit Union Arena|fortcollins': 'Loveland, 13 miles',
