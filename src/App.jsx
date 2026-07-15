@@ -59,7 +59,7 @@ function ModePicker({ onTeam, onOpenRoad }) {
         </button>
 
         <button className="card card--loud" onClick={onOpenRoad}>
-          <span className="card-title">Open Road</span>
+          <span className="card-title">Wildcard</span>
           <span className="card-sub">Put in your free dates. Land somewhere you’d never have picked.</span>
         </button>
       </div>
@@ -324,7 +324,7 @@ function DatePicker({ onGo, onBack }) {
   return (
     <>
       <Header onBack={onBack} />
-      <Strip left="Open Road" right="Pick your dates" />
+      <Strip left="Wildcard" right="Pick your dates" />
 
       <div className="pad">
         <Kicker>When are you free?</Kicker>
@@ -381,7 +381,7 @@ export default function App() {
   // The strip's left-hand word, and the result screen's. In Mode 1 it is who you
   // follow; in Mode 2 there is no team — it is the weekend you gave away.
   const title = road
-    ? (range ? rangeLabel(range.from, range.to) : 'Open Road')
+    ? (range ? rangeLabel(range.from, range.to) : 'Wildcard')
     : (team ? team.name : '')
   const poolTowns = road ? townsFromSlate(slate).length : 0
 
