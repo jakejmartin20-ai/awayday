@@ -51,6 +51,7 @@ function ModePicker({ onTeam, onOpenRoad }) {
       <Header />
       <Strip left="Choose your fate" right="" />
       <div className="pad">
+        <p className="intro">A roulette for sports trips. Fate picks the town — wherever it lands, that’s the trip.</p>
         <Kicker>Two ways in</Kicker>
 
         <button className="card card--loud" onClick={onTeam}>
@@ -73,11 +74,11 @@ function ModePicker({ onTeam, onOpenRoad }) {
 // filtered out here. NFL and NHL carry no such key, so nothing shipped changes
 // and the NHL bake needs no edit at all.
 // ---------------------------------------------------------------------------
-function LeaguePicker({ onPick, onBack }) {
+function LeaguePicker({ onPick, onBack, onHome }) {
   const leagues = LEAGUES.filter(l => l.mode2Only !== true)
   return (
     <>
-      <Header onBack={onBack} />
+      <Header onBack={onBack} onHome={onHome} />
       <Strip left="Team Away Day" right="Step 1 of 3" />
       <div className="pad">
         <Kicker>Pick a league</Kicker>
@@ -98,12 +99,12 @@ function LeaguePicker({ onPick, onBack }) {
 // ---------------------------------------------------------------------------
 // 3. TEAM PICKER — a plain list. No club marks anywhere.
 // ---------------------------------------------------------------------------
-function TeamPicker({ leagueId, onPick, onBack }) {
+function TeamPicker({ leagueId, onPick, onBack, onHome }) {
   const league = LEAGUES.find(l => l.id === leagueId)
   const teams = teamsInLeague(leagueId)
   return (
     <>
-      <Header onBack={onBack} />
+      <Header onBack={onBack} onHome={onHome} />
       <Strip left={league.name} right="Step 2 of 3" />
       <div className="pad">
         <Kicker>Pick your team</Kicker>
@@ -123,7 +124,7 @@ function TeamPicker({ leagueId, onPick, onBack }) {
 // ---------------------------------------------------------------------------
 // 4. AWAY SLATE — and THE DEAL  (Mode 1)
 // ---------------------------------------------------------------------------
-function Slate({ team, games, autoDeal, onDealt, onBack }) {
+function Slate({ team, games, autoDeal, onDealt, onBack, onHome }) {
   const towns = townsFromSlate(games)
   const needsDeal = towns.length > SLICES
 
@@ -186,7 +187,7 @@ function Slate({ team, games, autoDeal, onDealt, onBack }) {
 
   return (
     <>
-      <Header onBack={busy ? undefined : onBack} />
+      <Header onBack={busy ? undefined : onBack} onHome={busy ? undefined : onHome} />
       <Strip left={team.name} right={stripRight} />
 
       <div className="pad">
@@ -300,7 +301,7 @@ function Month({ y, m, min, max, from, to, onPick }) {
 const MONTH_NAMES = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
   'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER']
 
-function DatePicker({ onGo, onBack }) {
+function DatePicker({ onGo, onBack, onHome }) {
   const { min, max } = dateBounds()
   const [from, setFrom] = useState(null)
   const [to, setTo] = useState(null)
@@ -323,7 +324,7 @@ function DatePicker({ onGo, onBack }) {
 
   return (
     <>
-      <Header onBack={onBack} />
+      <Header onBack={onBack} onHome={onHome} />
       <Strip left="Wildcard" right="Pick your dates" />
 
       <div className="pad">
@@ -385,6 +386,24 @@ export default function App() {
     : (team ? team.name : '')
   const poolTowns = road ? townsFromSlate(slate).length : 0
 
+  // HOME. The wordmark on every screen returns here and wipes the run, so you
+  // never come home to a half-finished machine. This is the return-home path —
+  // the single-step arrow is kept only on the choice screens (league, team,
+  // dates, slate), never on the fate screens where "back" would re-run an
+  // animation or re-randomise a result.
+  const goHome = () => {
+    setMode(null)
+    setLeagueId(null)
+    setTeamId(null)
+    setRange(null)
+    setSlate([])
+    setWheelGames([])
+    setDealt(false)
+    setAutoDeal(false)
+    setGame(null)
+    setScreen('mode')
+  }
+
   const pickTeam = (id) => {
     setTeamId(id)
     setSlate(awaySlate(id))
@@ -430,15 +449,16 @@ export default function App() {
         <LeaguePicker
           onPick={(id) => { setLeagueId(id); setScreen('team') }}
           onBack={() => setScreen('mode')}
+          onHome={goHome}
         />
       )}
 
       {screen === 'team' && (
-        <TeamPicker leagueId={leagueId} onPick={pickTeam} onBack={() => setScreen('league')} />
+        <TeamPicker leagueId={leagueId} onPick={pickTeam} onBack={() => setScreen('league')} onHome={goHome} />
       )}
 
       {screen === 'dates' && (
-        <DatePicker onGo={dealRange} onBack={() => setScreen('mode')} />
+        <DatePicker onGo={dealRange} onBack={() => setScreen('mode')} onHome={goHome} />
       )}
 
       {screen === 'slate' && team && (
@@ -449,6 +469,7 @@ export default function App() {
           autoDeal={autoDeal}
           onDealt={onDealt}
           onBack={() => setScreen('team')}
+          onHome={goHome}
         />
       )}
 
@@ -459,7 +480,7 @@ export default function App() {
           title={title}
           poolTowns={poolTowns}
           onRim={() => setScreen('wheel')}
-          onBack={() => setScreen('dates')}
+          onHome={goHome}
         />
       )}
 
@@ -472,11 +493,7 @@ export default function App() {
           auto={road}
           onResult={(g) => { setGame(g); setScreen('result') }}
           onDealAgain={dealAgain}
-          onBack={() => {
-            if (road) { setScreen('dates'); return }
-            setAutoDeal(false)
-            setScreen('slate')
-          }}
+          onHome={goHome}
         />
       )}
 
@@ -485,7 +502,7 @@ export default function App() {
           game={game}
           title={title}
           onSpinAgain={() => setScreen('wheel')}
-          onBack={() => setScreen('wheel')}
+          onHome={goHome}
         />
       )}
     </div>

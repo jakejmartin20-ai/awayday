@@ -128,7 +128,7 @@ function pinXY(town, view, W) {
   return { x, y: p.y - view.originY }
 }
 
-export default function DealMap({ games, title, poolTowns, onRim, onBack }) {
+export default function DealMap({ games, title, poolTowns, onRim, onHome }) {
   const stage = useRef(null)
   const timers = useRef([])
   const [box, setBox] = useState(null)             // { W, H, view, tiles, pins }
@@ -170,7 +170,7 @@ export default function DealMap({ games, title, poolTowns, onRim, onBack }) {
 
   return (
     <>
-      <Header onBack={onBack} />
+      <Header onHome={onHome} />
       <Strip left={title} right={`${poolTowns} towns in play`} />
 
       <div className="pad">

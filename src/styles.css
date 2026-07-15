@@ -78,6 +78,19 @@ button {
   white-space: nowrap;
 }
 
+/* The wordmark doubles as Home on every screen but the home screen itself.
+   Strip the button chrome; the typography above still applies. */
+.wordmark--home {
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  color: var(--charcoal);
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .wordmark-bar {
   flex: 1;
   height: 8px;
@@ -133,6 +146,17 @@ button {
 }
 
 .note--tight { margin: 0 0 14px; }
+
+/* Home-screen explainer — one line under the strip that says what this is. */
+.intro {
+  color: var(--charcoal);
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+  margin: 2px 0 22px;
+}
 
 /* --- BUTTONS ------------------------------------------------------------- */
 .btn {

@@ -4,13 +4,15 @@
 // whole broadcast.
 // ---------------------------------------------------------------------------
 
-export function Header({ onBack }) {
+export function Header({ onBack, onHome }) {
   return (
     <div className="header">
       {onBack
         ? <button className="back" onClick={onBack} aria-label="Back">&#8592;</button>
         : <span className="back back--empty" aria-hidden="true" />}
-      <span className="wordmark">Away Day</span>
+      {onHome
+        ? <button className="wordmark wordmark--home" onClick={onHome} aria-label="Home">Away Day</button>
+        : <span className="wordmark">Away Day</span>}
       <span className="wordmark-bar" />
     </div>
   )

@@ -15,7 +15,7 @@ function osmUrl(lat, lng) {
   return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`
 }
 
-export default function Result({ game, title, onSpinAgain, onBack }) {
+export default function Result({ game, title, onSpinAgain, onHome }) {
   const share = async () => {
     // The fixture line reads for both modes: "AT THE BEARS" in Mode 1, "IOWA
     // CUBS AT TOLEDO MUD HENS" in Mode 2. The result screen cannot tell them
@@ -29,7 +29,7 @@ export default function Result({ game, title, onSpinAgain, onBack }) {
 
   return (
     <>
-      <Header onBack={onBack} />
+      <Header onHome={onHome} />
       <Strip left={title} right="The trip" />
 
       <div className="pad">
