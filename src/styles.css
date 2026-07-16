@@ -71,7 +71,7 @@ button {
 
 .wordmark {
   font-weight: 700;
-  font-size: 26px;
+  font-size: 30px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   transform: var(--skew);
