@@ -978,7 +978,7 @@ export const CITIES = {
     todo: ['The Airborne & Special Operations Museum', 'The Cape Fear Botanical Garden', 'The old Market House and the downtown around it']
   },
   fortmyers: {
-    city: 'Fort Myers', state: 'Florida', lat: 26.5378, lng: -81.8420,
+    city: 'Fort Myers', state: 'Florida', lat: 26.6406, lng: -81.8723,
     facts: [
       'Edison and Henry Ford had their winter houses next door to each other here, and both are open.',
       'Sanibel and Captiva are just offshore and are where people go to pick up shells.',
@@ -1410,7 +1410,7 @@ export const CITIES = {
     todo: ['Assateague, and the ponies', 'Ocean City, if the group wants a boardwalk', 'The Ward Museum of Wildfowl Art']
   },
   sanantonio: {
-    city: 'San Antonio', state: 'Texas', lat: 29.4098, lng: -98.6019,
+    city: 'San Antonio', state: 'Texas', lat: 29.4246, lng: -98.4951,
     facts: [
       'The Alamo is in the middle of downtown, smaller than everyone expects, and free.',
       'The River Walk runs a level below the streets, for miles, and you can eat the whole way along it.',
@@ -17562,7 +17562,8 @@ const STATE_CODES = {
   'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'Ohio': 'OH',
   'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI',
   'South Carolina': 'SC', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT',
-  'Virginia': 'VA', 'Washington': 'WA', 'Wisconsin': 'WI',
+  'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV',
+  'Wisconsin': 'WI', 'South Dakota': 'SD',
   'Alberta, Canada': 'AB, CAN', 'British Columbia, Canada': 'BC, CAN',
   'Manitoba, Canada': 'MB, CAN', 'Ontario, Canada': 'ON, CAN',
   'Quebec, Canada': 'QC, CAN'
@@ -17575,9 +17576,16 @@ export const stateCode = (s) => STATE_CODES[s] || s
 // label starts at 138). "ON, CAN" does not fit on it. "ON" does — and the
 // LANDING, which has a whole line to itself, says the rest.
 //   MEASURE THE BOX BEFORE YOU PUT SOMETHING IN IT.
+// The international cards store a country as their "state". The landing keeps
+// the full name (stateCode below), but the wheel slice needs something short.
+const INTL_WHEEL = {
+  'Australia': 'AUS', 'Brazil': 'BRA', 'Finland': 'FIN', 'France': 'FRA',
+  'Germany': 'GER', 'Mexico': 'MEX', 'Spain': 'ESP', 'United Kingdom': 'UK'
+}
 export const shortCode = (s) => {
   const c = STATE_CODES[s]
-  return c ? c.split(',')[0].trim() : ''
+  if (c) return c.split(',')[0].trim()
+  return INTL_WHEEL[s] || ''
 }
 
 // A TOWN, not a game. Folds every game on in that town, inside your window, into

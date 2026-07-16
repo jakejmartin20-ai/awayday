@@ -10,8 +10,13 @@ import { Header, Strip, Kicker, Loud, Quiet } from './Frame'
 // ---------------------------------------------------------------------------
 
 function osmUrl(lat, lng) {
-  const d = 0.06
-  const bbox = [lng - d, lat - d / 2, lng + d, lat + d / 2].join(',')
+  // Hold the box to the iframe's 350×220 aspect at EVERY latitude. Longitude
+  // degrees shrink toward the poles (Mercator), so a fixed-shape box stretches
+  // the map and throws the pin off up north (Canada). Scale the longitude
+  // half-span by 1/cos(lat) to keep a constant on-screen shape north and south.
+  const hlat = 0.03
+  const hlng = (350 / 220) * hlat / Math.cos(lat * Math.PI / 180)
+  const bbox = [lng - hlng, lat - hlat, lng + hlng, lat + hlat].join(',')
   return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`
 }
 
