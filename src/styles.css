@@ -718,6 +718,13 @@ button {
 .tiles { position: absolute; top: 0; left: 0; }
 .tiles img { position: absolute; width: 256px; height: 256px; display: block; }
 
+/* Border reference lines over the deal-map tiles: state/province soft, country
+   harder, both charcoal so they read against OSM without fighting the pins.
+   They live inside .dealmap, so they fade out with the map on the lift. */
+.borders { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.b-state { fill: none; stroke: rgba(28, 28, 28, 0.28); stroke-width: 1; stroke-linejoin: round; }
+.b-country { fill: none; stroke: rgba(28, 28, 28, 0.62); stroke-width: 1.6; stroke-linejoin: round; }
+
 /* OSM's attribution is a condition of the tiles being free. It stays. */
 .attrib {
   position: absolute;

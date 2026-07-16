@@ -390,11 +390,13 @@ export default function App() {
     : (team ? team.name : '')
   const poolTowns = road ? townsFromSlate(slate).length : 0
 
-  // HOME. The wordmark on every screen returns here and wipes the run, so you
-  // never come home to a half-finished machine. This is the return-home path —
-  // the single-step arrow is kept only on the choice screens (league, team,
-  // dates, slate), never on the fate screens where "back" would re-run an
-  // animation or re-randomise a result.
+  // TWO WAYS BACK. The wordmark is HOME on every screen — it wipes the run so you
+  // never come home to a half-finished machine. The single-step arrow is on every
+  // screen too, EXCEPT it never points back into the wheel: returning to the wheel
+  // re-spins it (Mode 2) or resets it unspun (Mode 1). So from the wheel and the
+  // result, "back" goes to your INPUTS — your slate (Mode 1) or your dates (Mode 2)
+  // — where you can change your pick and run it again. (Only "Spin again" re-enters
+  // the wheel, and only because you asked it to.)
   const goHome = () => {
     setMode(null)
     setLeagueId(null)
@@ -406,6 +408,13 @@ export default function App() {
     setAutoDeal(false)
     setGame(null)
     setScreen('mode')
+  }
+
+  // Back from a fate screen (wheel, result) lands on the last STABLE input screen.
+  const backToInputs = () => {
+    if (road) { setScreen('dates'); return }
+    setAutoDeal(false)
+    setScreen('slate')
   }
 
   const pickTeam = (id) => {
@@ -484,6 +493,7 @@ export default function App() {
           title={title}
           poolTowns={poolTowns}
           onRim={() => setScreen('wheel')}
+          onBack={() => setScreen('dates')}
           onHome={goHome}
         />
       )}
@@ -497,6 +507,7 @@ export default function App() {
           auto={road}
           onResult={(g) => { setGame(g); setScreen('result') }}
           onDealAgain={dealAgain}
+          onBack={backToInputs}
           onHome={goHome}
         />
       )}
@@ -506,6 +517,7 @@ export default function App() {
           game={game}
           title={title}
           onSpinAgain={() => setScreen('wheel')}
+          onBack={backToInputs}
           onHome={goHome}
         />
       )}

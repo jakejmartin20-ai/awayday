@@ -75,7 +75,7 @@ const easeOut = (t) => 1 - Math.pow(1 - t, 4) // heavy — it hangs at the end
 // Mode 1 does not pass `auto`. You tap. Nothing shipped changes.
 const AUTO_MS = 260
 
-export default function Wheel({ games, title, dealt, auto, onResult, onSpinAgain, onDealAgain, onHome }) {
+export default function Wheel({ games, title, dealt, auto, onResult, onSpinAgain, onDealAgain, onBack, onHome }) {
   const n = games.length
   const step = 360 / n
   const colours = sliceColours(n)
@@ -155,7 +155,7 @@ export default function Wheel({ games, title, dealt, auto, onResult, onSpinAgain
 
   return (
     <>
-      <Header onHome={spinning ? undefined : onHome} />
+      <Header onBack={spinning ? undefined : onBack} onHome={spinning ? undefined : onHome} />
       <Strip left={title} right={`${n} TOWNS ON THE WHEEL`} />
 
       <div className="pad">

@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Header, Strip, Kicker } from './Frame'
+import { BORDERS } from './borders'
 
 // ---------------------------------------------------------------------------
 // AWAY DAY — THE DEAL-MAP  (Mode 2. Mocked and approved, S18.)
@@ -128,7 +129,28 @@ function pinXY(town, view, W) {
   return { x, y: p.y - view.originY }
 }
 
-export default function DealMap({ games, title, poolTowns, onRim, onHome }) {
+// Border rings -> one SVG path, projected with the SAME maths as the tiles and
+// pins so the lines sit exactly on the coastlines. Rings fully off the stage are
+// skipped so the path stays short. Soft state lines and hard country lines are
+// two separate paths (drawn with different weight), built the same way.
+function pathFor(rings, view, W, H) {
+  let d = ''
+  for (const ring of rings) {
+    let minx = 1e18, miny = 1e18, maxx = -1e18, maxy = -1e18
+    const pr = ring.map(([lng, lat]) => {
+      const p = project(lat, lng, view.z)
+      const x = p.x - view.originX, y = p.y - view.originY
+      if (x < minx) minx = x; if (x > maxx) maxx = x
+      if (y < miny) miny = y; if (y > maxy) maxy = y
+      return [x, y]
+    })
+    if (maxx < -20 || minx > W + 20 || maxy < -20 || miny > H + 20) continue
+    pr.forEach(([x, y], i) => { d += (i ? 'L' : 'M') + x.toFixed(1) + ',' + y.toFixed(1) })
+  }
+  return d
+}
+
+export default function DealMap({ games, title, poolTowns, onRim, onBack, onHome }) {
   const stage = useRef(null)
   const timers = useRef([])
   const [box, setBox] = useState(null)             // { W, H, view, tiles, pins }
@@ -143,7 +165,9 @@ export default function DealMap({ games, title, poolTowns, onRim, onHome }) {
     setBox({
       W, H, view,
       tiles: tilesFor(view, W, H),
-      pins: games.map(g => pinXY(g, view, W))
+      pins: games.map(g => pinXY(g, view, W)),
+      stateD: pathFor(BORDERS.states, view, W, H),
+      countryD: pathFor(BORDERS.countries, view, W, H)
     })
   }, [games])
 
@@ -170,7 +194,7 @@ export default function DealMap({ games, title, poolTowns, onRim, onHome }) {
 
   return (
     <>
-      <Header onHome={onHome} />
+      <Header onBack={onBack} onHome={onHome} />
       <Strip left={title} right={`${poolTowns} towns in play`} />
 
       <div className="pad">
@@ -183,6 +207,12 @@ export default function DealMap({ games, title, poolTowns, onRim, onHome }) {
                 <img key={t.key} src={t.src} alt="" style={{ left: t.left, top: t.top }} />
               ))}
             </div>
+            {box && (
+              <svg className="borders" width={box.W} height={box.H} viewBox={`0 0 ${box.W} ${box.H}`}>
+                <path className="b-state" d={box.stateD} />
+                <path className="b-country" d={box.countryD} />
+              </svg>
+            )}
             <div className="attrib">
               &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>
             </div>
