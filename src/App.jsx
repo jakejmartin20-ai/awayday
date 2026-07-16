@@ -141,12 +141,12 @@ function Slate({ team, games, autoDeal, onDealt, onBack, onHome }) {
 
   const deal = () => {
     if (phase !== 'idle') return
-    // Every town to the wheel as a townObject — same shape the deal produces,
-    // so the result screen's `game.games` (What's on) is always present. Passing
-    // the bare first game here (t[0]) left it undefined and blanked the result —
-    // which every NFL team hit, since a team's ≤9 away towns never trigger a deal.
-    if (!needsDeal) { onDealt(towns.map(townObject), false); return }
 
+    // The deal animation runs in BOTH cases now, so Team Away Day deals its cards
+    // onto the wheel the way Wildcard does — no hard cut into the spin. When there
+    // are more than nine towns fate picks nine; otherwise every town is a slice, so
+    // we deal them all. Either way the cards hand off to the auto-spinning wheel,
+    // as townObjects (so the result screen's `game.games` is always present).
     setPhase('shuffle')
 
     const shuffleTick = () => {
@@ -162,16 +162,16 @@ function Slate({ team, games, autoDeal, onDealt, onBack, onHome }) {
     timers.current.push(setTimeout(() => {
       setFlash(-1)
       setPhase('picking')
-      const nine = dealNine(games)
+      const chosen = needsDeal ? dealNine(games) : towns.map(townObject)
 
-      nine.forEach((g, i) => {
+      chosen.forEach((g, i) => {
         timers.current.push(setTimeout(() => {
           setOrder(o => [g, ...o.filter(x => x.id !== g.id)])
           setPicked(p => [...p, g.id])
         }, i * PICK_MS))
       })
 
-      timers.current.push(setTimeout(() => onDealt(nine, true), SLICES * PICK_MS + HANDOFF_MS))
+      timers.current.push(setTimeout(() => onDealt(chosen, needsDeal), chosen.length * PICK_MS + HANDOFF_MS))
     }, SHUFFLE_MS))
   }
 
@@ -184,7 +184,7 @@ function Slate({ team, games, autoDeal, onDealt, onBack, onHome }) {
   }, [autoDeal])
 
   const busy = phase !== 'idle'
-  const stripRight = phase === 'picking' ? `${SLICES} TOWNS ON THE WHEEL` : `${games.length} GAMES`
+  const stripRight = phase === 'picking' ? `${needsDeal ? SLICES : towns.length} TOWNS ON THE WHEEL` : `${games.length} GAMES`
   const line = needsDeal
     ? `Fate deals nine of these ${towns.length} towns onto the wheel.`
     : 'Every one of these is a slice on the wheel.'
