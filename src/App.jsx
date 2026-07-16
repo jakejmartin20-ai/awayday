@@ -141,7 +141,11 @@ function Slate({ team, games, autoDeal, onDealt, onBack, onHome }) {
 
   const deal = () => {
     if (phase !== 'idle') return
-    if (!needsDeal) { onDealt(towns.map(t => t[0]), false); return }
+    // Every town to the wheel as a townObject — same shape the deal produces,
+    // so the result screen's `game.games` (What's on) is always present. Passing
+    // the bare first game here (t[0]) left it undefined and blanked the result —
+    // which every NFL team hit, since a team's ≤9 away towns never trigger a deal.
+    if (!needsDeal) { onDealt(towns.map(townObject), false); return }
 
     setPhase('shuffle')
 
