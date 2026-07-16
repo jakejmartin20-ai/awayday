@@ -72,7 +72,9 @@ const easeOut = (t) => 1 - Math.pow(1 - t, 4) // heavy — it hangs at the end
 // GOING TO PRESS IS A FAKE DECISION. The commitment lives on the DATE screen
 // now, and fate runs unbroken from there to the result.
 //
-// Mode 1 does not pass `auto`. You tap. Nothing shipped changes.
+// Both modes auto-spin now: the CTA on the previous screen (Wildcard's deal-map,
+// Team Away Day's slate "Spin") IS the spin, so the wheel settles for a beat and
+// goes on its own — no second tap. The Spin button below is a fallback only.
 const AUTO_MS = 260
 
 export default function Wheel({ games, title, dealt, auto, onResult, onSpinAgain, onDealAgain, onBack, onHome }) {

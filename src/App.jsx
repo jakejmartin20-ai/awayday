@@ -504,7 +504,7 @@ export default function App() {
           games={wheelGames}
           title={title}
           dealt={dealt}
-          auto={road}
+          auto={true}
           onResult={(g) => { setGame(g); setScreen('result') }}
           onDealAgain={dealAgain}
           onBack={backToInputs}
