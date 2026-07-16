@@ -90,7 +90,6 @@ function LeaguePicker({ onPick, onBack, onHome }) {
           </button>
         ))}
 
-        <p className="note">NHL joins on 16 July, when its schedule drops. NBA follows in August.</p>
       </div>
     </>
   )
